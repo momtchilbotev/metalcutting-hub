@@ -5,6 +5,7 @@ import legacy from '@vitejs/plugin-legacy'
 export default defineConfig({
   root: 'src',
   publicDir: '../public',
+  envDir: '..',
   plugins: [
     legacy({
       targets: ['defaults', 'not IE 11']
