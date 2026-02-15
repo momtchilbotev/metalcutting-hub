@@ -153,7 +153,7 @@ export class AdminUsers {
       btn.addEventListener('click', async () => {
         const userId = btn.dataset.verify;
         await adminService.toggleUserVerification(userId, true);
-        window.showToast 'Потребителят е верифициран.', 'success');
+        window.showToast('Потребителят е верифициран.', 'success');
       });
     });
 

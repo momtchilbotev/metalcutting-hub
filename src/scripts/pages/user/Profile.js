@@ -277,7 +277,7 @@ export class ProfilePage {
     }
 
     if (newPassword !== confirm) {
-      window.showToast 'Паролите не съвпадат.', 'warning');
+      window.showToast('Паролите не съвпадат.', 'warning');
       return;
     }
 

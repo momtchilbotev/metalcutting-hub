@@ -203,7 +203,7 @@ export class AuthService {
     try {
       const user = await this.getUser();
       if (!user) {
-        throw new Error 'Not authenticated';
+        throw new Error('Not authenticated');
       }
 
       const { data, error } = await supabase
