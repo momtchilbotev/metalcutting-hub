@@ -55,8 +55,8 @@ export class HomePage {
                 Metalcutting Hub
               </h1>
               <p class="lead mb-4">
-                Пазарът за металорежещи инструменти в България.
-                Намирайте най-добрите оферти за резбофрези, свредла, фрези и други.
+                Пазарът за всичко необходимо за металообработката в България.
+                Намирайте най-добрите оферти за резервни части, измервателни, режещи инструменти и много други.
               </p>
 
               <!-- Search Form -->
@@ -67,7 +67,7 @@ export class HomePage {
                       <i class="bi bi-search"></i>
                     </span>
                     <input type="text" class="form-control" id="home-search-input"
-                      placeholder="Търсете инструменти, резбофрези, фрези..."
+                      placeholder="Търсете инструменти, резервни части, ..."
                       aria-label="Търсене">
                   </div>
                 </div>
