@@ -236,7 +236,7 @@ export class ListingCreatePage {
         window.showToast('Няма намерено изображение в клипборда.', 'warning');
       } catch (err) {
         console.error('Clipboard error:', err);
-        window.showToast='Грешка при четене от клипборда. Използвайте бутона за качване на файлове.', 'warning';
+        window.showToast('Грешка при четене от клипборда. Използвайте бутона за качване на файлове.', 'warning');
       }
     });
 

@@ -1,6 +1,5 @@
 import { listingService } from '../../services/listings.js';
 import { ListingCard } from '../../components/ListingCard.js';
-import { isInWatchlist, addToWatchlist, removeFromWatchlist } from '../../services/watchlist.js';
 
 export class ListingListPage {
   constructor(containerId, params = {}) {
