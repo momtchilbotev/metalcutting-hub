@@ -1,0 +1,33 @@
+{
+  "name": "metalcutting-hub",
+  "version": "1.0.0",
+  "description": "A Bulgarian marketplace SAAS for buying and selling metalcutting tools, measuring equipment, spare parts, and documentation. Similar to Bazar.bg and OLX.bg but focused specifically on the metalworking industry.",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/momtchilbotev/metalcutting-hub.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/momtchilbotev/metalcutting-hub/issues"
+  },
+  "homepage": "https://github.com/momtchilbotev/metalcutting-hub#readme",
+  "devDependencies": {
+    "@vitejs/plugin-legacy": "^7.2.1",
+    "sass": "^1.97.3",
+    "vite": "^7.3.1",
+    "vite-plugin-pwa": "^1.2.0"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.95.3",
+    "bootstrap": "^5.3.8"
+  }
+}
