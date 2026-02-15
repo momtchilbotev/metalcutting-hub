@@ -1,6 +1,13 @@
 {
+  "permissions": {
+    "allow": [
+      "mcp__web-search-prime__webSearchPrime",
+      "mcp__web-reader__webReader",
+      "mcp__supabase__list_extensions"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "supabase"
-  ],
-  "enableAllProjectMcpServers": true
+  ]
 }
