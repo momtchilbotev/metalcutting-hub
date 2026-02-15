@@ -13,9 +13,17 @@
     "type": "git",
     "url": "git+https://github.com/momtchilbotev/metalcutting-hub.git"
   },
-  "keywords": [],
+  "keywords": [
+    "marketplace",
+    "metalcutting",
+    "tools",
+    "bulgaria",
+    "classifieds",
+    "bazar",
+    "olx"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/momtchilbotev/metalcutting-hub/issues"
   },
