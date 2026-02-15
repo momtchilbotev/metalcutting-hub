@@ -70,7 +70,7 @@ export class Navbar {
         <a class="nav-link" href="/login">Вход</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link btn btn-outline-light btn-sm ms-2" href="/register">Регистрация</a>
+        <a class="nav-link" href="/register">Регистрация</a>
       </li>
     `;
   }
