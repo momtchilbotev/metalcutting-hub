@@ -3,6 +3,8 @@ import { VitePWA } from 'vite-plugin-pwa'
 import legacy from '@vitejs/plugin-legacy'
 
 export default defineConfig({
+  root: 'src',
+  publicDir: '../public',
   plugins: [
     legacy({
       targets: ['defaults', 'not IE 11']
@@ -27,7 +29,7 @@ export default defineConfig({
     })
   ],
   build: {
-    outDir: 'dist',
+    outDir: '../dist',
     sourcemap: true,
     rollupOptions: {
       output: {
