@@ -1,0 +1,43 @@
+-- Seed Bulgarian locations
+INSERT INTO locations (name_bg, name_en, type) VALUES
+('София', 'Sofia', 'city'),
+('Пловдив', 'Plovdiv', 'city'),
+('Варна', 'Varna', 'city'),
+('Бургас', 'Burgas', 'city'),
+('Русе', 'Ruse', 'city'),
+('Стара Загора', 'Stara Zagora', 'city'),
+('Плевен', 'Pleven', 'city'),
+('Добрич', 'Dobrich', 'city'),
+('Сливен', 'Sliven', 'city'),
+('Шумен', 'Shumen', 'city'),
+('Перник', 'Pernik', 'city'),
+('Пазарджик', 'Pazardzhik', 'city'),
+('Благоевград', 'Blagoevgrad', 'city'),
+('Велико Търново', 'Veliko Tarnovo', 'city'),
+('Враца', 'Vratsa', 'city'),
+('Габрово', 'Gabrovo', 'city'),
+('Асеновград', 'Asenovgrad', 'city'),
+('Видин', 'Vidin', 'city'),
+('Кърджали', 'Kardzhali', 'city'),
+('Кюстендил', 'Kyustendil', 'city'),
+('Ловеч', 'Lovech', 'city'),
+('Монтана', 'Montana', 'city'),
+('Пещера', 'Pernik', 'city'),
+('Разград', 'Razgrad', 'city'),
+('Силистра', 'Silistra', 'city'),
+('Търговище', 'Targovishte', 'city'),
+('Хасково', 'Haskovo', 'city'),
+('Ямбол', 'Yambol', 'city');
+
+-- Seed categories
+INSERT INTO categories (name_bg, name_en, slug, sort_order) VALUES
+('Металорежещи инструменти', 'Metalcutting Tools', 'metalcutting-tools', 1),
+('Резбофрези', 'Taps', 'taps', 2),
+('Свредла', 'Drills', 'drills', 3),
+('Фрези', 'Milling Cutters', 'milling-cutters', 4),
+('Измервателни уреди', 'Measuring Equipment', 'measuring-equipment', 5),
+('Резервни части', 'Spare Parts', 'spare-parts', 6),
+('Документация', 'Documentation', 'documentation', 7),
+('Абразивни инструменти', 'Abrasives', 'abrasives', 8),
+('Режещи пластини', 'Inserts', 'inserts', 9),
+('Оправни инструменти', 'Holding Tools', 'holding-tools', 10);
