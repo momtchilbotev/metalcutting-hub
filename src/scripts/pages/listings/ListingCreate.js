@@ -1,7 +1,7 @@
 import { listingService } from '../../services/listings.js';
 import { authService } from '../../services/auth.js';
 import { storageService } from '../../services/storage.js';
-import { validateListingForm, validateImages } from '../../utils/validators.js';
+import { validateListingForm, validateImages, transformNumericFields } from '../../utils/validators.js';
 import { formatErrorMessage } from '../../utils/helpers.js';
 
 export class ListingCreatePage {
@@ -342,8 +342,11 @@ export class ListingCreatePage {
       status: status
     };
 
+    // Transform empty numeric fields to null
+    const processedData = transformNumericFields(formData, ['price']);
+
     // Validate form
-    const validation = validateListingForm(formData);
+    const validation = validateListingForm(processedData);
     if (!validation.isValid) {
       this.showErrors(validation.errors);
       return;
@@ -355,7 +358,7 @@ export class ListingCreatePage {
     try {
       // Create listing with images
       const imageFiles = this.uploadedImages.map(img => img.file);
-      const listing = await listingService.createListing(formData, imageFiles);
+      const listing = await listingService.createListing(processedData, imageFiles);
 
       window.showToast(
         status === 'active' ? 'Обявата е публикувана успешно!' : 'Черновата е запазена!',

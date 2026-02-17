@@ -1,7 +1,7 @@
 import { listingService } from '../../services/listings.js';
 import { authService } from '../../services/auth.js';
 import { storageService } from '../../services/storage.js';
-import { validateListingForm, validateImages } from '../../utils/validators.js';
+import { validateListingForm, validateImages, transformNumericFields } from '../../utils/validators.js';
 import { formatErrorMessage } from '../../utils/helpers.js';
 
 export class ListingEditPage {
@@ -344,7 +344,10 @@ export class ListingEditPage {
       status: document.getElementById('listing-status').value
     };
 
-    const validation = validateListingForm(formData);
+    // Transform empty numeric fields to null
+    const processedData = transformNumericFields(formData, ['price']);
+
+    const validation = validateListingForm(processedData);
     if (!validation.isValid) {
       this.showErrors(validation.errors);
       return;
@@ -354,7 +357,7 @@ export class ListingEditPage {
 
     try {
       // Update listing
-      const updated = await listingService.updateListing(this.listing.id, formData);
+      const updated = await listingService.updateListing(this.listing.id, processedData);
 
       // Handle image deletions
       const toDelete = this.existingImages.filter(img => img._delete);

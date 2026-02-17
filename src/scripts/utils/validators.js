@@ -111,6 +111,26 @@ export function validatePrice(price) {
 }
 
 /**
+ * Transform empty string values to null for numeric fields
+ * @param {Object} data - Form data object
+ * @param {string[]} numericFields - Array of field names that should be numeric
+ * @returns {Object} - Transformed data with null instead of empty strings
+ */
+export function transformNumericFields(data, numericFields = ['price']) {
+  const transformed = { ...data };
+  for (const field of numericFields) {
+    if (transformed[field] === '') {
+      transformed[field] = null;
+    } else if (transformed[field] !== null && transformed[field] !== undefined) {
+      // Parse to number to ensure it's a valid numeric value
+      const parsed = parseFloat(transformed[field]);
+      transformed[field] = isNaN(parsed) ? null : parsed;
+    }
+  }
+  return transformed;
+}
+
+/**
  * Image file validation
  * @param {File[]} files - Files to validate
  * @returns {Object} - Validation result
@@ -175,7 +195,8 @@ export function validateListingForm(formData) {
   if (!descResult.isValid) errors.description = descResult.error;
 
   // Price (optional but must be valid if provided)
-  if (formData.price && formData.price !== '') {
+  // Check for null/undefined (not provided) vs 0 or empty string
+  if (formData.price !== null && formData.price !== undefined && formData.price !== '') {
     const priceResult = validatePrice(formData.price);
     if (!priceResult.isValid) errors.price = priceResult.error;
   }
