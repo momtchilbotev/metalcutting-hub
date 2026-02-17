@@ -7,6 +7,10 @@ export class Navbar {
     this.container = document.getElementById(containerId);
     this.currentUser = null;
     this.isAdminUser = false;
+    this.refreshHandler = this.refresh.bind(this);
+
+    // Listen for auth state changes
+    window.addEventListener('refresh-navbar', this.refreshHandler);
   }
 
   async render() {
@@ -179,6 +183,9 @@ export class Navbar {
   }
 
   destroy() {
+    // Remove event listener
+    window.removeEventListener('refresh-navbar', this.refreshHandler);
+
     if (this.container) {
       this.container.innerHTML = '';
     }
