@@ -110,6 +110,11 @@ export class AuthService {
       this.currentUser = null;
       this.currentProfile = null;
 
+      // Refresh navbar to show logged-out state
+      if (window.navbar) {
+        await window.navbar.refresh();
+      }
+
       // Navigate to home
       window.router.navigate('/');
     } catch (error) {

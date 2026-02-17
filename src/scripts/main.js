@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await initializeApp();
 
     // Initialize shared components
-    const navbar = new Navbar('navbar-container');
+    window.navbar = new Navbar('navbar-container');
     const footer = new Footer('footer-container');
 
     // Render navbar and footer

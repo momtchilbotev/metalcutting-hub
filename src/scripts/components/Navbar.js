@@ -7,6 +7,7 @@ export class Navbar {
     this.container = document.getElementById(containerId);
     this.currentUser = null;
     this.isAdminUser = false;
+    this.authSubscription = null;
   }
 
   async render() {
@@ -23,6 +24,22 @@ export class Navbar {
 
     // Attach event listeners
     this.attachEventListeners();
+
+    // Initialize auth state listener on first render
+    if (!this.authSubscription) {
+      this.initAuthListener();
+    }
+  }
+
+  initAuthListener() {
+    // Subscribe to auth state changes
+    const { data } = authService.onAuthStateChange(async (event, session) => {
+      this.currentUser = session?.user || null;
+      this.isAdminUser = this.currentUser ? await isAdmin() : false;
+      await this.render();
+    });
+
+    this.authSubscription = data.subscription;
   }
 
   getTemplate() {
@@ -179,6 +196,12 @@ export class Navbar {
   }
 
   destroy() {
+    // Clean up auth subscription
+    if (this.authSubscription) {
+      this.authSubscription.unsubscribe();
+      this.authSubscription = null;
+    }
+
     if (this.container) {
       this.container.innerHTML = '';
     }
