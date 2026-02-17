@@ -400,7 +400,7 @@ export class ListingService {
 
       const { data, error } = await supabase
         .from('watchlist')
-        .select('id')
+        .select('user_id')
         .eq('user_id', user.id)
         .eq('listing_id', listingId)
         .maybeSingle();
