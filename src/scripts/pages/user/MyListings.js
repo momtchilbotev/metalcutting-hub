@@ -165,7 +165,7 @@ export class MyListingsPage {
 
     tbody.innerHTML = filteredListings.map(listing => {
       const primaryImage = listing.listing_images?.find(img => img.is_primary) || listing.listing_images?.[0];
-      const imageUrl = primaryImage?.url || '/images/placeholder.jpg';
+      const imageUrl = primaryImage?.url || '/images/placeholder.svg';
 
       return `
         <tr>

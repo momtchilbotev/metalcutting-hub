@@ -175,7 +175,7 @@ export class ListingCard {
   }
 
   getPlaceholderUrl() {
-    return '/images/placeholder.jpg';
+    return '/images/placeholder.svg';
   }
 
   escapeHtml(text) {

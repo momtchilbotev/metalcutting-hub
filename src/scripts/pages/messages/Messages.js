@@ -404,7 +404,7 @@ export class MessagesPage {
   }
 
   getImageUrl(storagePath) {
-    if (!storagePath) return '/images/placeholder.jpg';
+    if (!storagePath) return '/images/placeholder.svg';
     const { data } = supabase.storage
       .from('listing-images')
       .getPublicUrl(storagePath);

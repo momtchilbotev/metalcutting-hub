@@ -78,7 +78,7 @@ export class ListingDetailsPage {
               <div class="card-body p-0">
                 <!-- Main Image -->
                 <div class="position-relative">
-                  <img src="${primaryImage?.url || '/images/placeholder.jpg'}"
+                  <img src="${primaryImage?.url || '/images/placeholder.svg'}"
                     id="main-image"
                     class="w-100 rounded-top"
                     style="max-height: 500px; object-fit: contain; background: #f5f5f5;"
@@ -100,7 +100,7 @@ export class ListingDetailsPage {
                   <div class="p-3 bg-light">
                     <div class="d-flex gap-2 overflow-auto">
                       ${allImages.map((img, idx) => `
-                        <img src="${img.url || '/images/placeholder.jpg'}"
+                        <img src="${img.url || '/images/placeholder.svg'}"
                           class="thumbnail ${idx === 0 ? 'border-primary' : ''}"
                           style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
                           onclick="document.getElementById('main-image').src='${img.url}'"
@@ -239,7 +239,7 @@ export class ListingDetailsPage {
               <div class="row g-4">
                 ${this.similarListings.map(listing => {
                   const primaryImg = listing.listing_images?.find(img => img.is_primary) || listing.listing_images?.[0];
-                  const imgUrl = primaryImg?.url || '/images/placeholder.jpg';
+                  const imgUrl = primaryImg?.url || '/images/placeholder.svg';
 
                   return `
                     <div class="col-6 col-md-3">

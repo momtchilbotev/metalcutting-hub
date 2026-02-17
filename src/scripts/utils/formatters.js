@@ -261,9 +261,9 @@ export function formatListingSlug(listing) {
  */
 export function formatImageUrl(image) {
   if (!image || !image.storage_path) {
-    return '/images/placeholder.jpg';
+    return '/images/placeholder.svg';
   }
-  return image.url || `/images/placeholder.jpg`;
+  return image.url || `/images/placeholder.svg`;
 }
 
 /**
