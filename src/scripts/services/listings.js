@@ -86,8 +86,19 @@ export class ListingService {
 
       if (error) throw error;
 
+      // Add image URLs to listing images
+      const listingsWithData = data ? data.map(listing => {
+        if (listing.listing_images && listing.listing_images.length > 0) {
+          listing.listing_images = listing.listing_images.map(img => ({
+            ...img,
+            url: storageService.getPublicUrl(img.storage_path)
+          }));
+        }
+        return listing;
+      }) : [];
+
       return {
-        listings: data || [],
+        listings: listingsWithData,
         count: count || 0,
         page: filters.page || 1,
         itemsPerPage: filters.items_per_page || filters.limit || 20
