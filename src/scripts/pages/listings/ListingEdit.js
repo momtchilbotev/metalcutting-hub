@@ -391,9 +391,11 @@ export class ListingEditPage {
       }
 
       window.showToast('Обявата е обновена успешно!', 'success');
+
+      // Wait for database propagation before navigating
       setTimeout(() => {
         window.router.navigate(`/listings/view?id=${this.listing.id}`);
-      }, 1000);
+      }, 2000);
     } catch (error) {
       console.error('Submit error:', error);
       window.showToast(formatErrorMessage(error), 'error');

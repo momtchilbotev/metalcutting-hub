@@ -29,7 +29,22 @@ export class ListingDetailsPage {
   }
 
   async loadListing(id) {
-    this.listing = await listingService.getListingById(id);
+    // Try to fetch listing with retry logic for database propagation delay
+    let listing = null;
+    let attempts = 0;
+    const maxAttempts = 3;
+
+    while (!listing && attempts < maxAttempts) {
+      listing = await listingService.getListingById(id);
+      if (listing) break;
+      attempts++;
+      if (attempts < maxAttempts) {
+        // Wait before retry (for database propagation)
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    this.listing = listing;
 
     if (!this.listing) {
       this.showNotFound();
