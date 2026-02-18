@@ -119,13 +119,25 @@ class Router {
    * @param {boolean} pushState - Whether to push to browser history
    */
   async navigate(path, params = {}, pushState = true) {
+    // Parse params from path if not explicitly provided
+    if (Object.keys(params).length === 0 && path.includes('?')) {
+      const [_, queryString] = path.split('?');
+      if (queryString) {
+        const searchParams = new URLSearchParams(queryString);
+        for (const [key, value] of searchParams) {
+          params[key] = value;
+        }
+      }
+    }
     this.params = params;
 
     // Build URL with query parameters
     let url = path;
     if (Object.keys(params).length > 0) {
       const queryString = new URLSearchParams(params).toString();
-      url += `?${queryString}`;
+      // Remove existing query string from path if present
+      const pathWithoutQuery = path.split('?')[0];
+      url = `${pathWithoutQuery}?${queryString}`;
     }
 
     // Check auth guard if exists
