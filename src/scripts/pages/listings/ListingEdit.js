@@ -394,7 +394,8 @@ export class ListingEditPage {
 
       // Wait for database propagation before navigating
       setTimeout(() => {
-        window.router.navigate('/listings/view', {id: this.listing.id});
+        // window.router.navigate('/listings/view', {id: this.listing.id});
+        window.router.navigate('/my-listings');
       }, 2000);
     } catch (error) {
       console.error('Submit error:', error);
