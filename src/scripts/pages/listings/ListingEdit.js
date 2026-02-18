@@ -3,6 +3,7 @@ import { authService } from '../../services/auth.js';
 import { storageService } from '../../services/storage.js';
 import { validateListingForm, validateImages, transformNumericFields } from '../../utils/validators.js';
 import { formatErrorMessage } from '../../utils/helpers.js';
+import { supabase } from '../../utils/supabaseClient.js';
 
 export class ListingEditPage {
   constructor(containerId, params = {}) {
@@ -401,17 +402,21 @@ export class ListingEditPage {
   }
 
   async deleteImageFromDB(imageId) {
-    await fetch('/api/listing-images/' + imageId, { method: 'DELETE' });
-    // This would normally go through the API
+    const { error } = await supabase
+      .from('listing_images')
+      .delete()
+      .eq('id', imageId);
+    if (error) throw error;
   }
 
   async saveImageToDB(imageData) {
-    await fetch('/api/listing-images', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(imageData)
-    });
-    // This would normally go through the API
+    const { data, error } = await supabase
+      .from('listing_images')
+      .insert([imageData])
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
   }
 
   async deleteListing() {
