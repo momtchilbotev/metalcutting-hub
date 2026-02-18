@@ -24,7 +24,7 @@ The Supabase MCP server is configured in `.vscode/mcp.json` and available for da
 ```
 
 When working with the database, use the Supabase MCP tools.
-
+But when need DB migrations use "apply-migration" (after approval) instead of DDL operation.
 ## Code Conventions
 
 When generating or scaffolding code:
