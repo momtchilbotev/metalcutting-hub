@@ -12,6 +12,7 @@ export class ListingDetailsPage {
     try {
       // Get listing ID from params
       const listingId = this.params.id;
+      console.log('[ListingDetails] Loading listing:', listingId);
       if (!listingId) {
         this.showNotFound();
         return;
