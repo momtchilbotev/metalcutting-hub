@@ -30,7 +30,7 @@ export class MyListingsPage {
   }
 
   async loadListings() {
-    const result = await listingService.getMyListings({ status: undefined });
+    const result = await listingService.getMyListings(); // Remove status parameter - defaults to 'all'
     this.listings = result.listings;
   }
 

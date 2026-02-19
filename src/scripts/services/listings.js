@@ -26,9 +26,12 @@ export class ListingService {
 
       // Apply filters
       if (filters.status) {
-        query = query.eq('status', filters.status);
+        if (filters.status !== 'all') {
+          query = query.eq('status', filters.status);
+        }
+        // If status === 'all', don't apply any status filter (fetch all)
       } else {
-        query = query.eq('status', 'active'); // Default to active only
+        query = query.eq('status', 'active'); // Default to active only for public queries
       }
 
       if (filters.category_id) {
@@ -344,7 +347,8 @@ export class ListingService {
 
     return await this.getListings({
       ...filters,
-      user_id: user.id
+      user_id: user.id,
+      status: filters.status || 'all' // Default to 'all' for own listings
     });
   }
 
