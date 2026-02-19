@@ -66,6 +66,266 @@ npm run preview
 
 - **[Research & Requirements](./Research_metalcutting_hub_requirements.md)** - Comprehensive research on marketplace SAAS requirements, tech stack recommendations, and Bulgarian market considerations
 
+## Database Schema
+
+### Core Tables
+
+#### `profiles`
+Extends Supabase auth.users with user profile data.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key (references auth.users) |
+| `full_name` | VARCHAR(100) | User's full name |
+| `phone` | VARCHAR(20) | Contact phone number |
+| `location_id` | UUID | Foreign key to locations |
+| `avatar_url` | VARCHAR(255) | Profile image URL |
+| `role` | user_role | 'user', 'moderator', or 'admin' |
+| `is_verified` | BOOLEAN | Account verification status |
+| `is_premium` | BOOLEAN | Premium membership flag |
+| `created_at` | TIMESTAMPTZ | Account creation timestamp |
+| `updated_at` | TIMESTAMPTZ | Last update timestamp |
+
+#### `listings`
+Main marketplace listings table.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `user_id` | UUID | Foreign key to profiles (seller) |
+| `category_id` | UUID | Foreign key to categories |
+| `title` | VARCHAR(200) | Listing title |
+| `description` | TEXT | Full item description |
+| `price` | DECIMAL(12,2) | Item price |
+| `currency` | VARCHAR(3) | Currency code (default: BGN) |
+| `condition` | VARCHAR(20) | 'new', 'used', or 'refurbished' |
+| `location_id` | UUID | Foreign key to locations |
+| `status` | VARCHAR(20) | 'active', 'sold', 'draft', or 'expired' |
+| `is_featured` | BOOLEAN | Featured listing flag |
+| `is_urgent` | BOOLEAN | Urgent listing flag |
+| `views_count` | INTEGER | View counter |
+| `expires_at` | TIMESTAMPTZ | Listing expiration date |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+| `updated_at` | TIMESTAMPTZ | Last update timestamp |
+
+#### `listing_images`
+Images associated with listings.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `listing_id` | UUID | Foreign key to listings |
+| `storage_path` | VARCHAR(255) | Supabase Storage path |
+| `order_index` | INTEGER | Display order |
+| `is_primary` | BOOLEAN | Primary image flag |
+| `created_at` | TIMESTAMPTZ | Upload timestamp |
+
+#### `categories`
+Hierarchical category structure for marketplace items.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `name_bg` | VARCHAR(100) | Category name (Bulgarian) |
+| `name_en` | VARCHAR(100) | Category name (English) |
+| `slug` | VARCHAR(100) | URL-friendly identifier |
+| `parent_id` | UUID | Self-reference for hierarchy |
+| `icon_url` | VARCHAR(255) | Category icon URL |
+| `sort_order` | INTEGER | Display order |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+
+#### `locations`
+Bulgarian geographical locations (cities and regions).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `name_bg` | VARCHAR(100) | Location name (Bulgarian) |
+| `name_en` | VARCHAR(100) | Location name (English) |
+| `type` | VARCHAR(20) | 'city' or 'region' |
+| `parent_id` | UUID | Self-reference for hierarchy |
+| `created_at` | TIMESTAMPTZ | Creation timestamp |
+
+#### `messages`
+User-to-user messaging system.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `listing_id` | UUID | Foreign key to listings |
+| `sender_id` | UUID | Foreign key to profiles (sender) |
+| `receiver_id` | UUID | Foreign key to profiles (receiver) |
+| `content` | TEXT | Message content |
+| `is_read` | BOOLEAN | Read status |
+| `created_at` | TIMESTAMPTZ | Sent timestamp |
+
+#### `watchlist`
+User's saved listings.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `user_id` | UUID | Foreign key to profiles |
+| `listing_id` | UUID | Foreign key to listings |
+| `created_at` | TIMESTAMPTZ | Added timestamp |
+
+#### `reviews`
+User reviews and ratings.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `reviewer_id` | UUID | Foreign key to profiles (reviewer) |
+| `reviewed_user_id` | UUID | Foreign key to profiles (reviewed) |
+| `listing_id` | UUID | Foreign key to listings |
+| `rating` | INTEGER | Rating from 1 to 5 |
+| `comment` | TEXT | Review comment |
+| `created_at` | TIMESTAMPTZ | Review timestamp |
+
+#### `admin_audit_log`
+Audit trail for admin/moderator actions.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `admin_id` | UUID | Foreign key to profiles |
+| `action` | VARCHAR(50) | Action performed |
+| `target_type` | VARCHAR(50) | Target entity type |
+| `target_id` | UUID | Target entity ID |
+| `details` | JSONB | Additional action details |
+| `created_at` | TIMESTAMPTZ | Action timestamp |
+
+### Entity Relationship Diagram
+
+```mermaid
+erDiagram
+    profiles ||--o{ listings : "creates (user_id)"
+    profiles ||--o{ listing_images : "owns (via listings)"
+    profiles ||--o{ messages : "sends (sender_id)"
+    profiles ||--o{ messages : "receives (receiver_id)"
+    profiles ||--o{ watchlist : "saves (user_id)"
+    profiles ||--o{ reviews : "writes (reviewer_id)"
+    profiles ||--o{ reviews : "receives (reviewed_user_id)"
+    profiles ||--o{ admin_audit_log : "performs (admin_id)"
+
+    listings ||--|| categories : "belongs to (category_id)"
+    listings ||--o| locations : "located in (location_id)"
+    listings ||--o{ listing_images : "has (listing_id)"
+    listings ||--o{ messages : "references (listing_id)"
+    listings ||--o{ watchlist : "saved in (listing_id)"
+    listings ||--o{ reviews : "rated in (listing_id)"
+
+    locations ||--o{ locations : "parent-child (parent_id)"
+    locations ||--o{ profiles : "contains (location_id)"
+
+    categories ||--o{ categories : "parent-child (parent_id)"
+
+    auth_users ||--|| profiles : "extends (id)"
+
+    profiles {
+        uuid id PK
+        string full_name
+        string phone
+        uuid location_id FK
+        string avatar_url
+        user_role role
+        boolean is_verified
+        boolean is_premium
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    listings {
+        uuid id PK
+        uuid user_id FK
+        uuid category_id FK
+        string title
+        text description
+        decimal price
+        string currency
+        string condition
+        uuid location_id FK
+        string status
+        boolean is_featured
+        boolean is_urgent
+        integer views_count
+        timestamptz expires_at
+        timestamptz created_at
+        timestamptz updated_at
+    }
+
+    listing_images {
+        uuid id PK
+        uuid listing_id FK
+        string storage_path
+        integer order_index
+        boolean is_primary
+        timestamptz created_at
+    }
+
+    categories {
+        uuid id PK
+        string name_bg
+        string name_en
+        string slug
+        uuid parent_id FK
+        string icon_url
+        integer sort_order
+        timestamptz created_at
+    }
+
+    locations {
+        uuid id PK
+        string name_bg
+        string name_en
+        string type
+        uuid parent_id FK
+        timestamptz created_at
+    }
+
+    messages {
+        uuid id PK
+        uuid listing_id FK
+        uuid sender_id FK
+        uuid receiver_id FK
+        text content
+        boolean is_read
+        timestamptz created_at
+    }
+
+    watchlist {
+        uuid user_id FK
+        uuid listing_id FK
+        timestamptz created_at
+    }
+
+    reviews {
+        uuid id PK
+        uuid reviewer_id FK
+        uuid reviewed_user_id FK
+        uuid listing_id FK
+        integer rating
+        text comment
+        timestamptz created_at
+    }
+
+    admin_audit_log {
+        uuid id PK
+        uuid admin_id FK
+        string action
+        string target_type
+        uuid target_id
+        jsonb details
+        timestamptz created_at
+    }
+```
+
+### Database Features
+
+- **Row-Level Security (RLS)**: All tables have RLS policies enforcing data access control
+- **Full-Text Search**: Bulgarian language support via `pg_trgm` extension
+- **Triggers**: Auto-update `updated_at` timestamps and view counting
+- **Indexes**: Performance-optimized indexes for common query patterns
+
 ## Remaining Work
 
 - [ ] TypeScript migration (optional)
