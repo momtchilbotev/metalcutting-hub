@@ -11,7 +11,7 @@ export class Footer {
     const currentYear = new Date().getFullYear();
 
     return `
-      <footer class="bg-dark text-light mt-auto">
+      <footer class="bg-primary text-light mt-auto">
         <div class="container py-5">
           <div class="row g-4">
             <!-- About -->
