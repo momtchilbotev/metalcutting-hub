@@ -266,10 +266,11 @@ footer {
 
 footer a {
   transition: var(--transition);
+  color: rgba(255, 255, 255, 0.85) !important;
 }
 
 footer a:hover {
-  color: var(--primary-color) !important;
+  color: #fff !important;
 }
 
 /* === Footer Buttons === */
@@ -306,6 +307,22 @@ footer .btn-primary:active {
 
 footer .btn-primary:focus {
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5) !important;
+}
+
+/* Footer btn-outline-light styling - match navbar */
+footer .btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  color: #fff !important;
+}
+
+footer .btn-outline-light:hover {
+  background-color: #fff !important;
+  color: var(--primary-color) !important;
+  border-color: #fff !important;
+}
+
+footer .btn-outline-light:focus {
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.5) !important;
 }
 
 /* Footer form input styling */

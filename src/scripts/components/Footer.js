@@ -20,18 +20,18 @@ export class Footer {
                 <i class="bi bi-gear-wide-connected me-2"></i>
                 Metalcutting Hub
               </h5>
-              <p class="text-muted">
+              <p class="text-light">
                 Пазарът за металорежещи инструменти в България.
                 Намирайте най-добрите оферти за резбофрези, свредла, фрези и други.
               </p>
               <div class="d-flex gap-3">
-                <a href="#" class="text-muted text-decoration-none" aria-label="Facebook">
+                <a href="#" class="text-light text-decoration-none" aria-label="Facebook">
                   <i class="bi bi-facebook fs-5"></i>
                 </a>
-                <a href="#" class="text-muted text-decoration-none" aria-label="LinkedIn">
+                <a href="#" class="text-light text-decoration-none" aria-label="LinkedIn">
                   <i class="bi bi-linkedin fs-5"></i>
                 </a>
-                <a href="#" class="text-muted text-decoration-none" aria-label="YouTube">
+                <a href="#" class="text-light text-decoration-none" aria-label="YouTube">
                   <i class="bi bi-youtube fs-5"></i>
                 </a>
               </div>
@@ -41,10 +41,10 @@ export class Footer {
             <div class="col-md-2 col-6">
               <h6 class="mb-3">Бързи връзки</h6>
               <ul class="list-unstyled">
-                <li class="mb-2"><a href="/" class="text-muted text-decoration-none">Начало</a></li>
-                <li class="mb-2"><a href="/listings" class="text-muted text-decoration-none">Обяви</a></li>
-                <li class="mb-2"><a href="/listings/create" class="text-muted text-decoration-none">Нова обява</a></li>
-                <li class="mb-2"><a href="/about" class="text-muted text-decoration-none">За нас</a></li>
+                <li class="mb-2"><a href="/" class="text-light text-decoration-none">Начало</a></li>
+                <li class="mb-2"><a href="/listings" class="text-light text-decoration-none">Обяви</a></li>
+                <li class="mb-2"><a href="/listings/create" class="text-light text-decoration-none">Нова обява</a></li>
+                <li class="mb-2"><a href="/about" class="text-light text-decoration-none">За нас</a></li>
               </ul>
             </div>
 
@@ -52,10 +52,10 @@ export class Footer {
             <div class="col-md-2 col-6">
               <h6 class="mb-3">Категории</h6>
               <ul class="list-unstyled">
-                <li class="mb-2"><a href="/listings?category=metalcutting-tools" class="text-muted text-decoration-none">Металорежещи</a></li>
-                <li class="mb-2"><a href="/listings?category=taps" class="text-muted text-decoration-none">Резбофрези</a></li>
-                <li class="mb-2"><a href="/listings?category=drills" class="text-muted text-decoration-none">Свредла</a></li>
-                <li class="mb-2"><a href="/listings?category=milling-cutters" class="text-muted text-decoration-none">Фрези</a></li>
+                <li class="mb-2"><a href="/listings?category=metalcutting-tools" class="text-light text-decoration-none">Металорежещи</a></li>
+                <li class="mb-2"><a href="/listings?category=taps" class="text-light text-decoration-none">Резбофрези</a></li>
+                <li class="mb-2"><a href="/listings?category=drills" class="text-light text-decoration-none">Свредла</a></li>
+                <li class="mb-2"><a href="/listings?category=milling-cutters" class="text-light text-decoration-none">Фрези</a></li>
               </ul>
             </div>
 
@@ -63,10 +63,10 @@ export class Footer {
             <div class="col-md-4">
               <h6 class="mb-3">Помощ</h6>
               <ul class="list-unstyled mb-3">
-                <li class="mb-2"><a href="/help" class="text-muted text-decoration-none">Често задавани въпроси</a></li>
-                <li class="mb-2"><a href="/terms" class="text-muted text-decoration-none">Общи условия</a></li>
-                <li class="mb-2"><a href="/privacy" class="text-muted text-decoration-none">Поверителност</a></li>
-                <li class="mb-2"><a href="/contact" class="text-muted text-decoration-none">Контакти</a></li>
+                <li class="mb-2"><a href="/help" class="text-light text-decoration-none">Често задавани въпроси</a></li>
+                <li class="mb-2"><a href="/terms" class="text-light text-decoration-none">Общи условия</a></li>
+                <li class="mb-2"><a href="/privacy" class="text-light text-decoration-none">Поверителност</a></li>
+                <li class="mb-2"><a href="/contact" class="text-light text-decoration-none">Контакти</a></li>
               </ul>
 
               <!-- Newsletter -->
@@ -76,7 +76,7 @@ export class Footer {
                   <div class="input-group input-group-sm">
                     <input type="email" class="form-control" placeholder="Вашият имейл"
                       aria-label="Email за новини" required>
-                    <button class="btn btn-primary" type="submit">Абониране</button>
+                    <button class="btn btn-outline-light" type="submit">Абониране</button>
                   </div>
                 </form>
               </div>
@@ -88,12 +88,12 @@ export class Footer {
           <!-- Copyright -->
           <div class="row align-items-center">
             <div class="col-md-6 text-center text-md-start">
-              <p class="mb-0 text-muted">
+              <p class="mb-0 text-light">
                 &copy; ${currentYear} Metalcutting Hub. Всички права запазени.
               </p>
             </div>
             <div class="col-md-6 text-center text-md-end">
-              <small class="text-muted">
+              <small class="text-light">
                 Направено с <i class="bi bi-heart-fill text-danger"></i> в България
               </small>
             </div>
