@@ -1,0 +1,23 @@
+/* Home Page Styles */
+
+/* === Hero Section === */
+.hero-section {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+}
+
+/* === Responsive - Home === */
+@media (max-width: 767.98px) {
+  .hero-section {
+    text-align: center;
+  }
+
+  .hero-section .display-4 {
+    font-size: 2rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-section {
+    padding: 5rem 0;
+  }
+}

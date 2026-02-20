@@ -3,94 +3,94 @@ import { adminGuard } from './services/admin.js';
 
 const routes = {
   '/': {
-    page: () => import('./pages/home/Home.js'),
+    page: () => import('../pages/home/home.js'),
     title: 'Metalcutting Hub - Начало',
     template: '/pages/home/home.html'
   },
   '/login': {
-    page: () => import('./pages/auth/Login.js'),
+    page: () => import('../pages/auth/login/login.js'),
     title: 'Вход - Metalcutting Hub',
-    template: '/pages/auth/login.html'
+    template: '/pages/auth/login/login.html'
   },
   '/register': {
-    page: () => import('./pages/auth/Register.js'),
+    page: () => import('../pages/auth/register/register.js'),
     title: 'Регистрация - Metalcutting Hub',
-    template: '/pages/auth/register.html'
+    template: '/pages/auth/register/register.html'
   },
   '/listings': {
-    page: () => import('./pages/listings/ListingList.js'),
+    page: () => import('../pages/listings/list/list.js'),
     title: 'Обяви - Metalcutting Hub',
-    template: '/pages/listings/listing-list.html'
+    template: '/pages/listings/list/list.html'
   },
   '/listings/create': {
-    page: () => import('./pages/listings/ListingCreate.js'),
+    page: () => import('../pages/listings/create/create.js'),
     title: 'Нова обява - Metalcutting Hub',
-    template: '/pages/listings/listing-create.html',
+    template: '/pages/listings/create/create.html',
     guard: authService.getSession.bind(authService)
   },
   '/listings/edit': {
-    page: () => import('./pages/listings/ListingEdit.js'),
+    page: () => import('../pages/listings/edit/edit.js'),
     title: 'Редактирай обява - Metalcutting Hub',
-    template: '/pages/listings/listing-edit.html',
+    template: '/pages/listings/edit/edit.html',
     guard: authService.getSession.bind(authService)
   },
   '/listings/view': {
-    page: () => import('./pages/listings/ListingDetails.js'),
+    page: () => import('../pages/listings/details/details.js'),
     title: 'Детайли - Metalcutting Hub',
-    template: '/pages/listings/listing-details.html'
+    template: '/pages/listings/details/details.html'
   },
   '/profile': {
-    page: () => import('./pages/user/Profile.js'),
+    page: () => import('../pages/user/profile/profile.js'),
     title: 'Моят профил - Metalcutting Hub',
-    template: '/pages/user/profile.html',
+    template: '/pages/user/profile/profile.html',
     guard: authService.getSession.bind(authService)
   },
   '/my-listings': {
-    page: () => import('./pages/user/MyListings.js'),
+    page: () => import('../pages/user/my-listings/my-listings.js'),
     title: 'Моите обяви - Metalcutting Hub',
-    template: '/pages/user/my-listings.html',
+    template: '/pages/user/my-listings/my-listings.html',
     guard: authService.getSession.bind(authService)
   },
   '/watchlist': {
-    page: () => import('./pages/user/Watchlist.js'),
+    page: () => import('../pages/user/watchlist/watchlist.js'),
     title: 'Наблюдавани - Metalcutting Hub',
-    template: '/pages/user/watchlist.html',
+    template: '/pages/user/watchlist/watchlist.html',
     guard: authService.getSession.bind(authService)
   },
   '/messages': {
-    page: () => import('./pages/messages/Messages.js'),
+    page: () => import('../pages/messages/messages.js'),
     title: 'Съобщения - Metalcutting Hub',
     template: '/pages/messages/messages.html',
     guard: authService.getSession.bind(authService)
   },
   '/admin': {
-    page: () => import('./pages/admin/AdminDashboard.js'),
+    page: () => import('../pages/admin/dashboard/dashboard.js'),
     title: 'Admin Panel - Metalcutting Hub',
-    template: '/pages/admin/admin-dashboard.html',
+    template: '/pages/admin/dashboard/dashboard.html',
     guard: () => adminGuard('admin')
   },
   '/admin/listings': {
-    page: () => import('./pages/admin/AdminListings.js'),
+    page: () => import('../pages/admin/listings/listings.js'),
     title: 'Manage Listings - Admin',
-    template: '/pages/admin/admin-listings.html',
+    template: '/pages/admin/listings/listings.html',
     guard: () => adminGuard('admin')
   },
   '/admin/users': {
-    page: () => import('./pages/admin/AdminUsers.js'),
+    page: () => import('../pages/admin/users/users.js'),
     title: 'Manage Users - Admin',
-    template: '/pages/admin/admin-users.html',
+    template: '/pages/admin/users/users.html',
     guard: () => adminGuard('admin')
   },
   '/admin/categories': {
-    page: () => import('./pages/admin/AdminCategories.js'),
+    page: () => import('../pages/admin/categories/categories.js'),
     title: 'Manage Categories - Admin',
-    template: '/pages/admin/admin-categories.html',
+    template: '/pages/admin/categories/categories.html',
     guard: () => adminGuard('admin')
   },
   '/admin/audit': {
-    page: () => import('./pages/admin/AdminAudit.js'),
+    page: () => import('../pages/admin/audit/audit.js'),
     title: 'Audit Log - Admin',
-    template: '/pages/admin/admin-audit.html',
+    template: '/pages/admin/audit/audit.html',
     guard: () => adminGuard('admin')
   }
 };

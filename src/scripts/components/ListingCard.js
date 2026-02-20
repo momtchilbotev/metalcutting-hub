@@ -9,7 +9,8 @@ export class ListingCard {
       showDate: options.showDate !== false,
       showCategory: options.showCategory || false,
       imageSize: options.imageSize || 'medium', // 'small', 'medium', 'large'
-      compact: options.compact || false
+      compact: options.compact || false,
+      isWatchlisted: options.isWatchlisted || false
     };
   }
 
@@ -102,7 +103,7 @@ export class ListingCard {
                 <button class="btn btn-outline-primary btn-watchlist"
                   data-listing-id="${listing.id}"
                   aria-label="Добави в наблюдавани">
-                  <i class="bi bi-heart"></i>
+                  <i class="bi ${this.options.isWatchlisted ? 'bi-heart-fill text-danger' : 'bi-heart'}"></i>
                 </button>
                 <button class="btn btn-outline-secondary btn-share"
                   data-listing-id="${listing.id}"

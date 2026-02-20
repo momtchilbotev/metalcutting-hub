@@ -1,0 +1,7 @@
+/* Watchlist Styles */
+.bi-heart {
+  transition: var(--transition);
+}
+.btn-watchlist .bi-heart-fill {
+  color: var(--danger-color);
+}

@@ -1,0 +1,7 @@
+/* Dashboard Styles */
+.admin-stat-card {
+  transition: var(--transition);
+}
+.admin-stat-card:hover {
+  transform: translateY(-2px);
+}

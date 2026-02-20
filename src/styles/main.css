@@ -135,11 +135,6 @@ body {
   box-shadow: var(--box-shadow);
 }
 
-/* === Hero Section === */
-.hero-section {
-  background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
-}
-
 /* === Buttons === */
 .btn {
   font-weight: 500;
@@ -343,73 +338,11 @@ footer .form-control::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
-/* === Image Upload === */
-#drop-zone {
-  border: 2px dashed rgba(0, 0, 0, 0.2);
-  transition: var(--transition);
-}
-
-#drop-zone.dragover {
-  border-color: var(--primary-color);
-  background-color: rgba(13, 110, 253, 0.05);
-}
-
-.thumbnail {
-  cursor: pointer;
-  transition: var(--transition);
-  border: 2px solid transparent;
-}
-
-.thumbnail:hover,
-.thumbnail.border-primary {
-  border-color: var(--primary-color);
-}
-
 /* === Loading States === */
 .spinner-border-sm {
   width: 1rem;
   height: 1rem;
   border-width: 0.15em;
-}
-
-/* === Admin Panel === */
-.admin-stat-card {
-  transition: var(--transition);
-}
-
-.admin-stat-card:hover {
-  transform: translateY(-2px);
-}
-
-/* === Messages === */
-#messages-container {
-  max-height: 500px;
-  overflow-y: auto;
-}
-
-.message-bubble {
-  max-width: 70%;
-  padding: 0.75rem 1rem;
-  border-radius: 1rem;
-}
-
-.message-bubble.sent {
-  background-color: var(--primary-color);
-  color: white;
-  margin-left: auto;
-}
-
-.message-bubble.received {
-  background-color: var(--light-color);
-}
-
-/* === Watchlist Heart === */
-.bi-heart {
-  transition: var(--transition);
-}
-
-.btn-watchlist .bi-heart-fill {
-  color: var(--danger-color);
 }
 
 /* === Price Display === */
@@ -424,14 +357,6 @@ footer .form-control::placeholder {
 
 /* === Responsive Utilities === */
 @media (max-width: 767.98px) {
-  .hero-section {
-    text-align: center;
-  }
-
-  .hero-section .display-4 {
-    font-size: 2rem;
-  }
-
   .listing-image-wrapper {
     padding-top: 66.67%; /* 3:2 aspect ratio on mobile */
   }
@@ -454,10 +379,6 @@ footer .form-control::placeholder {
 }
 
 @media (min-width: 768px) {
-  .hero-section {
-    padding: 5rem 0;
-  }
-
   /* Tablet specific adjustments */
   .container-md-custom {
     max-width: 720px;
