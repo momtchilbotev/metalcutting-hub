@@ -1,2 +1,61 @@
 /* Admin Categories Page Styles */
-/* No page-specific styles needed - uses shared styles */
+
+/* Icon Upload Area */
+.icon-upload-area {
+  border: 2px dashed #dee2e6;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-upload-area:hover {
+  border-color: #0d6efd;
+  background-color: #f0f6ff;
+}
+
+.icon-upload-area.dragover {
+  border-color: #0d6efd;
+  background-color: #e7f1ff;
+}
+
+.icon-upload-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.icon-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+.icon-preview-container img {
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
+  border-radius: 0.25rem;
+}
+
+.icon-remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-remove-btn i {
+  font-size: 0.75rem;
+}

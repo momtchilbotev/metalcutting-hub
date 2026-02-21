@@ -214,7 +214,8 @@ export class HomePage {
     const grid = document.getElementById('categories-grid');
     if (!grid) return;
 
-    const categoryIcons = {
+    // Fallback Bootstrap icons by slug
+    const fallbackIcons = {
       'metalcutting-tools': 'bi-tools',
       'taps': 'bi-gear',
       'drills': 'bi-arrow-through-circle',
@@ -224,12 +225,18 @@ export class HomePage {
       'documentation': 'bi-file-text',
       'abrasives': 'bi-grid-3x3',
       'inserts': 'bi-square',
-      'holding-tools': 'bi-clipboard-check'
+      'holding-tools': 'bi-clipboard-check',
+      'others': 'bi-tag'
     };
 
     grid.innerHTML = this.categories.slice(0, 8).map(cat => {
-      const icon = categoryIcons[cat.slug] || 'bi-tag';
+      const fallbackIcon = fallbackIcons[cat.slug] || 'bi-tag';
       const count = Math.floor(Math.random() * 100) + 10; // Placeholder count
+
+      // Use uploaded icon if available, otherwise use fallback Bootstrap icon
+      const iconHtml = cat.icon_url
+        ? `<img src="${this.escapeHtml(cat.icon_url)}" alt="${this.escapeHtml(cat.name_bg)}" class="category-icon-img mb-2">`
+        : `<i class="bi ${fallbackIcon} display-6 text-primary mb-2"></i>`;
 
       return `
         <div class="col-6 col-md-3">
@@ -237,7 +244,9 @@ export class HomePage {
             class="text-decoration-none category-card">
             <div class="card h-100 text-center hover-shadow transition-all">
               <div class="card-body p-3">
-                <i class="bi ${icon} display-6 text-primary mb-2"></i>
+                <div class="d-flex justify-content-center align-items-center" style="height: 48px;">
+                  ${iconHtml}
+                </div>
                 <h5 class="card-title small mb-1 text-dark">${this.escapeHtml(cat.name_bg)}</h5>
                 <small class="text-muted">${count} обяви</small>
               </div>

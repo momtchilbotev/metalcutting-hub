@@ -5,6 +5,15 @@
   background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
 }
 
+/* === Category Icons === */
+.category-icon-img {
+  max-width: 48px;
+  max-height: 48px;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
 /* === Responsive - Home === */
 @media (max-width: 767.98px) {
   .hero-section {

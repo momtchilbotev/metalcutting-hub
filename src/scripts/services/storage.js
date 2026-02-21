@@ -2,6 +2,7 @@ import { supabase } from '../utils/supabaseClient.js';
 import { APP_CONFIG } from '../config.js';
 
 const BUCKET_NAME = 'listing-images';
+const CATEGORY_ICONS_BUCKET = 'category-icons';
 
 export class StorageService {
   /**
@@ -237,6 +238,90 @@ export class StorageService {
 
       img.src = url;
     });
+  }
+
+  /**
+   * Upload category icon to Supabase Storage
+   * @param {File} file - The icon file to upload
+   * @param {string} categoryId - The category ID
+   * @returns {Promise<string>} - Public URL of the uploaded icon
+   */
+  async uploadCategoryIcon(file, categoryId) {
+    // Validate file type
+    const supportedFormats = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
+    if (!supportedFormats.includes(file.type)) {
+      throw new Error('Неподдържан формат. Използвайте JPG, PNG, WebP или SVG.');
+    }
+
+    // Validate file size (max 2MB for icons)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      throw new Error('Файлът е твърде голям. Максимум 2MB.');
+    }
+
+    // Create file path
+    const fileExt = file.name.split('.').pop();
+    const fileName = `icon.${fileExt}`;
+    const filePath = `${categoryId}/${fileName}`;
+
+    try {
+      // Delete existing icon first
+      await this.deleteCategoryIcon(categoryId);
+
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from(CATEGORY_ICONS_BUCKET)
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (error) throw error;
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from(CATEGORY_ICONS_BUCKET)
+        .getPublicUrl(filePath);
+
+      return urlData.publicUrl;
+    } catch (error) {
+      console.error('Upload category icon error:', error);
+      throw new Error('Грешка при качване на иконата. Моля, опитайте отново.');
+    }
+  }
+
+  /**
+   * Delete category icon from storage
+   * @param {string} categoryId - The category ID
+   * @returns {Promise<void>}
+   */
+  async deleteCategoryIcon(categoryId) {
+    try {
+      // List files in the category folder
+      const { data: files, error: listError } = await supabase.storage
+        .from(CATEGORY_ICONS_BUCKET)
+        .list(categoryId);
+
+      if (listError) {
+        // If folder doesn't exist, we're done
+        if (listError.message?.includes('not found')) {
+          return;
+        }
+        throw listError;
+      }
+
+      if (files && files.length > 0) {
+        const paths = files.map(f => `${categoryId}/${f.name}`);
+        const { error } = await supabase.storage
+          .from(CATEGORY_ICONS_BUCKET)
+          .remove(paths);
+
+        if (error) throw error;
+      }
+    } catch (error) {
+      console.error('Delete category icon error:', error);
+      // Don't throw - cleanup failures shouldn't block operations
+    }
   }
 }
 
