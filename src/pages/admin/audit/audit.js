@@ -105,6 +105,26 @@ export class AdminAuditPage {
         <nav class="mt-4">
           ${this.getPaginationTemplate()}
         </nav>
+
+        <!-- Details Modal -->
+        <div class="modal fade" id="auditDetailsModal" tabindex="-1" aria-labelledby="auditDetailsModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="auditDetailsModalLabel">
+                  <i class="bi bi-info-circle text-primary me-2"></i>Детайли на действието
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Затвори"></button>
+              </div>
+              <div class="modal-body" id="auditDetailsContent">
+                <!-- Content will be populated dynamically -->
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -133,11 +153,11 @@ export class AdminAuditPage {
   }
 
   attachEventListeners() {
-    // Details buttons
+    // Details buttons - use Bootstrap modal
     document.querySelectorAll('.btn-details').forEach(btn => {
       btn.addEventListener('click', () => {
         const details = JSON.parse(btn.dataset.details);
-        alert(JSON.stringify(details, null, 2));
+        this.showDetailsModal(details);
       });
     });
 
@@ -152,6 +172,57 @@ export class AdminAuditPage {
         }
       });
     });
+  }
+
+  showDetailsModal(details) {
+    const contentEl = document.getElementById('auditDetailsContent');
+    if (contentEl) {
+      contentEl.innerHTML = this.formatDetailsContent(details);
+
+      // Show the modal using Bootstrap
+      const modalEl = document.getElementById('auditDetailsModal');
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modal.show();
+    }
+  }
+
+  formatDetailsContent(details) {
+    if (!details || Object.keys(details).length === 0) {
+      return '<p class="text-muted mb-0">Няма допълнителни детайли</p>';
+    }
+
+    // Map detail keys to Bulgarian labels
+    const labels = {
+      isFeatured: 'Препоръчано',
+      isVerified: 'Верифициран',
+      newRole: 'Нова роля',
+      reason: 'Причина',
+      oldValue: 'Стара стойност',
+      newValue: 'Нова стойност'
+    };
+
+    // Format values based on type
+    const formatValue = (key, value) => {
+      if (typeof value === 'boolean') {
+        return value
+          ? '<span class="badge bg-success"><i class="bi bi-check-lg"></i> Да</span>'
+          : '<span class="badge bg-secondary"><i class="bi bi-x-lg"></i> Не</span>';
+      }
+      if (key === 'newRole') {
+        const roleLabels = { user: 'Потребител', moderator: 'Модератор', admin: 'Администратор' };
+        return `<span class="badge bg-info">${roleLabels[value] || value}</span>`;
+      }
+      return `<span class="text-dark">${this.escapeHtml(String(value))}</span>`;
+    };
+
+    const rows = Object.entries(details).map(([key, value]) => `
+      <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+        <span class="text-muted">${labels[key] || key}</span>
+        ${formatValue(key, value)}
+      </div>
+    `).join('');
+
+    return `<div class="px-2">${rows}</div>`;
   }
 
   showError() {
