@@ -412,16 +412,18 @@ export class StorageService {
     }
 
     // Create unique file path with timestamp to prevent caching issues
+    // Store avatars in user-specific folders: {userId}/filename
     const fileExt = file.name.split('.').pop() || 'png';
     const timestamp = Date.now();
     const randomSuffix = Math.random().toString(36).substring(2, 8);
     const fileName = `avatar-${timestamp}-${randomSuffix}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
 
     try {
       // Upload to Supabase Storage
       const { data, error } = await supabase.storage
         .from(AVATARS_BUCKET)
-        .upload(fileName, file, {
+        .upload(filePath, file, {
           cacheControl: 'no-cache',
           upsert: false
         });
@@ -434,7 +436,7 @@ export class StorageService {
       // Get public URL with cache-busting query parameter
       const { data: urlData } = supabase.storage
         .from(AVATARS_BUCKET)
-        .getPublicUrl(fileName);
+        .getPublicUrl(filePath);
 
       // Add timestamp to URL to bust browser cache
       const cacheBustedUrl = `${urlData.publicUrl}?t=${timestamp}`;
@@ -459,9 +461,10 @@ export class StorageService {
    */
   async _cleanupOldAvatars(userId, currentFileName) {
     try {
+      // Only list files in the specific user's folder
       const { data: files, error: listError } = await supabase.storage
         .from(AVATARS_BUCKET)
-        .list();
+        .list(userId);
 
       if (listError || !files || files.length === 0) {
         return;
@@ -470,10 +473,10 @@ export class StorageService {
       // Find old files to delete (exclude current file)
       const filesToDelete = files
         .filter(f => f.name !== currentFileName)
-        .map(f => f.name);
+        .map(f => `${userId}/${f.name}`);
 
       if (filesToDelete.length > 0) {
-        console.log('Cleaning up old avatars:', filesToDelete);
+        console.log('Cleaning up old avatars for user:', userId, filesToDelete);
         const { error } = await supabase.storage
           .from(AVATARS_BUCKET)
           .remove(filesToDelete);
