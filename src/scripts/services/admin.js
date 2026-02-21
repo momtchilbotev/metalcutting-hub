@@ -309,7 +309,7 @@ export class AdminService {
         .select(`
           *,
           admin:profiles!admin_audit_log_admin_id_fkey(full_name)
-        `)
+        `, { count: 'exact' })
         .order('created_at', { ascending: false })
         .range(from, to);
 
