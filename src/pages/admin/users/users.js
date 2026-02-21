@@ -182,19 +182,78 @@ export class AdminUsersPage {
   }
 
   async changeRole(userId, currentRole) {
-    const roles = ['user', 'moderator', 'admin'];
-    const currentIndex = roles.indexOf(currentRole);
-    const nextRole = roles[(currentIndex + 1) % roles.length];
+    const roles = [
+      { value: 'user', label: 'Потребител' },
+      { value: 'moderator', label: 'Модератор' },
+      { value: 'admin', label: 'Администратор' }
+    ];
 
-    Toast.confirm(`Промяна на ролята на "${formatRole(nextRole)}"?`, async () => {
-      try {
-        await adminService.updateUserRole(userId, nextRole);
-        Toast.success('Ролята е променена!');
-        await this.render();
-      } catch (error) {
-        Toast.error('Грешка при промяна на ролята.');
+    // Create modal HTML
+    const modalHtml = `
+      <div class="modal fade" id="roleModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Изберете роля</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              ${roles.map(role => `
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="radio" name="roleSelect"
+                    id="role-${role.value}" value="${role.value}"
+                    ${role.value === currentRole ? 'checked' : ''}>
+                  <label class="form-check-label d-flex align-items-center" for="role-${role.value}">
+                    <span class="badge bg-${this.getRoleBadgeClass(role.value)} me-2">${role.label}</span>
+                  </label>
+                </div>
+              `).join('')}
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+              <button type="button" class="btn btn-primary" id="confirmRoleChange">Запази</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove existing modal if any
+    const existingModal = document.getElementById('roleModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    const modalEl = document.getElementById('roleModal');
+    const modal = new bootstrap.Modal(modalEl);
+
+    // Handle confirm
+    document.getElementById('confirmRoleChange').addEventListener('click', async () => {
+      const selectedRole = document.querySelector('input[name="roleSelect"]:checked')?.value;
+
+      if (selectedRole && selectedRole !== currentRole) {
+        try {
+          await adminService.updateUserRole(userId, selectedRole);
+          Toast.success('Ролята е променена!');
+          modal.hide();
+          await this.render();
+        } catch (error) {
+          Toast.error('Грешка при промяна на ролята.');
+        }
+      } else {
+        modal.hide();
       }
     });
+
+    // Clean up modal on hide
+    modalEl.addEventListener('hidden.bs.modal', () => {
+      modalEl.remove();
+    });
+
+    modal.show();
   }
 
   async toggleVerification(userId, isCurrentlyVerified) {

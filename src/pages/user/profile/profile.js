@@ -1,5 +1,6 @@
 import './profile.css';
 import { authService } from '../../../scripts/services/auth.js';
+import { storageService } from '../../../scripts/services/storage.js';
 import { Toast } from '../../../scripts/components/Toast.js';
 import { formatDate, formatPhone } from '../../../scripts/utils/formatters.js';
 import { validateEmail, validateLength, validatePhone } from '../../../scripts/utils/validators.js';
@@ -59,7 +60,8 @@ export class ProfilePage {
                 <img src="${this.profile?.avatar_url || '/images/default-avatar.png'}"
                   class="rounded-circle mb-3"
                   style="width: 120px; height: 120px; object-fit: cover;"
-                  alt="Profile">
+                  alt="Profile"
+                  id="sidebar-avatar">
                 <h5 class="card-title">${this.escapeHtml(this.profile?.full_name || 'Потребител')}</h5>
                 <p class="text-muted">${this.escapeHtml(this.user?.email || '')}</p>
                 <span class="badge bg-${this.getRoleBadgeClass()}">${this.getRoleText()}</span>
@@ -142,23 +144,6 @@ export class ProfilePage {
                         ${!this.isEditing ? 'disabled' : ''}>
                       <div class="invalid-feedback" id="phone-error"></div>
                     </div>
-
-                    <!-- Location -->
-                    <div class="col-md-6 mb-3">
-                      <label for="location" class="form-label">Локация</label>
-                      <input type="text" class="form-control" id="location" name="location"
-                        value="${this.escapeHtml(this.profile?.location || '')}"
-                        placeholder="Напр. София"
-                        ${!this.isEditing ? 'disabled' : ''}>
-                    </div>
-                  </div>
-
-                  <!-- Bio -->
-                  <div class="mb-3">
-                    <label for="bio" class="form-label">Биография</label>
-                    <textarea class="form-control" id="bio" name="bio" rows="3"
-                      placeholder="Разкажете малко за себе си..."
-                      ${!this.isEditing ? 'disabled' : ''}>${this.escapeHtml(this.profile?.bio || '')}</textarea>
                   </div>
 
                   <!-- Action Buttons (only visible when editing) -->
@@ -300,7 +285,8 @@ export class ProfilePage {
   toggleEdit(editing) {
     this.isEditing = editing;
 
-    const inputs = document.querySelectorAll('#profile-form input:not([name="email"]), #profile-form textarea');
+    // Only toggle text inputs and textareas, not file inputs or email
+    const inputs = document.querySelectorAll('#profile-form input[type="text"], #profile-form input[type="tel"], #profile-form textarea');
     inputs.forEach(input => {
       input.disabled = !editing;
     });
@@ -319,9 +305,7 @@ export class ProfilePage {
   async saveProfile() {
     const formData = {
       full_name: document.getElementById('full_name').value.trim(),
-      phone: document.getElementById('phone').value.trim(),
-      location: document.getElementById('location').value.trim(),
-      bio: document.getElementById('bio').value.trim()
+      phone: document.getElementById('phone').value.trim()
     };
 
     // Validate
@@ -385,23 +369,46 @@ export class ProfilePage {
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      Toast.error('Размерът на файла не трябва да надвишава 5MB.');
+    if (file.size > 2 * 1024 * 1024) {
+      Toast.error('Размерът на файла не трябва да надвишава 2MB.');
       return;
     }
 
-    // Preview
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const preview = document.getElementById('avatar-preview');
-      if (preview) {
-        preview.src = e.target.result;
-      }
-    };
-    reader.readAsDataURL(file);
+    // Get both avatar elements
+    const preview = document.getElementById('avatar-preview');
+    const sidebarAvatar = document.getElementById('sidebar-avatar');
+    const originalSrc = preview?.src;
 
-    // TODO: Upload to storage and update profile
-    Toast.info('Функцията за качване на аватар ще бъде добавена скоро.');
+    try {
+      // Upload to storage
+      const avatarUrl = await storageService.uploadAvatar(file, this.user.id);
+
+      // Update profile with new avatar URL
+      await authService.updateProfile({ avatar_url: avatarUrl });
+
+      // Update both avatar images
+      if (preview) {
+        preview.src = avatarUrl;
+      }
+      if (sidebarAvatar) {
+        sidebarAvatar.src = avatarUrl;
+      }
+
+      // Update profile data
+      this.profile = { ...this.profile, avatar_url: avatarUrl };
+
+      Toast.success('Аватарът е обновен успешно!');
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      // Revert preview on error
+      if (preview && originalSrc) {
+        preview.src = originalSrc;
+      }
+      Toast.error(error.message || 'Грешка при качване на аватара.');
+    }
+
+    // Reset file input
+    event.target.value = '';
   }
 
   showError() {

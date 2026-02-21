@@ -3,6 +3,7 @@ import { APP_CONFIG } from '../config.js';
 
 const BUCKET_NAME = 'listing-images';
 const CATEGORY_ICONS_BUCKET = 'category-icons';
+const AVATARS_BUCKET = 'avatars';
 
 export class StorageService {
   /**
@@ -380,6 +381,109 @@ export class StorageService {
     } catch (error) {
       console.error('Delete category icon error:', error);
       // Don't throw - cleanup failures shouldn't block operations
+    }
+  }
+
+  /**
+   * Upload user avatar to Supabase Storage
+   * @param {File} file - The avatar file to upload
+   * @param {string} userId - The user ID
+   * @returns {Promise<string>} - Public URL of the uploaded avatar
+   */
+  async uploadAvatar(file, userId) {
+    // Validate inputs
+    if (!file) {
+      throw new Error('Няма избран файл.');
+    }
+    if (!userId) {
+      throw new Error('Липсва ID на потребителя.');
+    }
+
+    // Validate file type
+    const supportedFormats = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!supportedFormats.includes(file.type)) {
+      throw new Error('Неподдържан формат. Използвайте JPG, PNG, WebP или GIF.');
+    }
+
+    // Validate file size (max 2MB for avatars)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      throw new Error('Файлът е твърде голям. Максимум 2MB.');
+    }
+
+    // Create unique file path with timestamp to prevent caching issues
+    const fileExt = file.name.split('.').pop() || 'png';
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const fileName = `avatar-${timestamp}-${randomSuffix}.${fileExt}`;
+
+    try {
+      // Upload to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from(AVATARS_BUCKET)
+        .upload(fileName, file, {
+          cacheControl: 'no-cache',
+          upsert: false
+        });
+
+      if (error) {
+        console.error('Supabase upload error:', error);
+        throw new Error(`Грешка при качване: ${error.message}`);
+      }
+
+      // Get public URL with cache-busting query parameter
+      const { data: urlData } = supabase.storage
+        .from(AVATARS_BUCKET)
+        .getPublicUrl(fileName);
+
+      // Add timestamp to URL to bust browser cache
+      const cacheBustedUrl = `${urlData.publicUrl}?t=${timestamp}`;
+
+      // Clean up old avatars AFTER successful upload (don't await, do in background)
+      this._cleanupOldAvatars(userId, fileName).catch(err => {
+        console.warn('Failed to cleanup old avatars:', err);
+      });
+
+      return cacheBustedUrl;
+    } catch (error) {
+      console.error('Upload avatar error:', error);
+      throw error.message ? error : new Error('Грешка при качване на аватара. Моля, опитайте отново.');
+    }
+  }
+
+  /**
+   * Clean up old avatars for a user (except the current one)
+   * @private
+   * @param {string} userId - The user ID
+   * @param {string} currentFileName - The current file name to keep
+   */
+  async _cleanupOldAvatars(userId, currentFileName) {
+    try {
+      const { data: files, error: listError } = await supabase.storage
+        .from(AVATARS_BUCKET)
+        .list();
+
+      if (listError || !files || files.length === 0) {
+        return;
+      }
+
+      // Find old files to delete (exclude current file)
+      const filesToDelete = files
+        .filter(f => f.name !== currentFileName)
+        .map(f => f.name);
+
+      if (filesToDelete.length > 0) {
+        console.log('Cleaning up old avatars:', filesToDelete);
+        const { error } = await supabase.storage
+          .from(AVATARS_BUCKET)
+          .remove(filesToDelete);
+
+        if (error) {
+          console.warn('Failed to delete old avatars:', error);
+        }
+      }
+    } catch (err) {
+      console.warn('Cleanup error:', err);
     }
   }
 }
