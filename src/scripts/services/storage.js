@@ -247,6 +247,14 @@ export class StorageService {
    * @returns {Promise<string>} - Public URL of the uploaded icon
    */
   async uploadCategoryIcon(file, categoryId) {
+    // Validate inputs
+    if (!file) {
+      throw new Error('Няма избран файл.');
+    }
+    if (!categoryId) {
+      throw new Error('Липсва ID на категорията.');
+    }
+
     // Validate file type
     const supportedFormats = ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'];
     if (!supportedFormats.includes(file.type)) {
@@ -259,34 +267,85 @@ export class StorageService {
       throw new Error('Файлът е твърде голям. Максимум 2MB.');
     }
 
-    // Create file path
-    const fileExt = file.name.split('.').pop();
-    const fileName = `icon.${fileExt}`;
+    // Create unique file path with timestamp to prevent caching issues
+    const fileExt = file.name.split('.').pop() || 'png';
+    const timestamp = Date.now();
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const fileName = `icon-${timestamp}-${randomSuffix}.${fileExt}`;
     const filePath = `${categoryId}/${fileName}`;
 
     try {
-      // Delete existing icon first
-      await this.deleteCategoryIcon(categoryId);
+      console.log('Starting icon upload:', { categoryId, fileName, fileType: file.type, fileSize: file.size });
 
-      // Upload to Supabase Storage
+      // Upload to Supabase Storage (don't use upsert, use unique filename)
       const { data, error } = await supabase.storage
         .from(CATEGORY_ICONS_BUCKET)
         .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true
+          cacheControl: 'no-cache',
+          upsert: false
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase upload error:', error);
+        throw new Error(`Грешка при качване: ${error.message}`);
+      }
 
-      // Get public URL
+      console.log('Upload successful:', data);
+
+      // Get public URL with cache-busting query parameter
       const { data: urlData } = supabase.storage
         .from(CATEGORY_ICONS_BUCKET)
         .getPublicUrl(filePath);
 
-      return urlData.publicUrl;
+      // Add timestamp to URL to bust browser cache
+      const cacheBustedUrl = `${urlData.publicUrl}?t=${timestamp}`;
+      console.log('Icon URL:', cacheBustedUrl);
+
+      // Clean up old icons AFTER successful upload (don't await, do in background)
+      this._cleanupOldIcons(categoryId, fileName).catch(err => {
+        console.warn('Failed to cleanup old icons:', err);
+      });
+
+      return cacheBustedUrl;
     } catch (error) {
       console.error('Upload category icon error:', error);
-      throw new Error('Грешка при качване на иконата. Моля, опитайте отново.');
+      throw error.message ? error : new Error('Грешка при качване на иконата. Моля, опитайте отново.');
+    }
+  }
+
+  /**
+   * Clean up old icons for a category (except the current one)
+   * @private
+   * @param {string} categoryId - The category ID
+   * @param {string} currentFileName - The current file name to keep
+   */
+  async _cleanupOldIcons(categoryId, currentFileName) {
+    try {
+      const { data: files, error: listError } = await supabase.storage
+        .from(CATEGORY_ICONS_BUCKET)
+        .list(categoryId);
+
+      if (listError || !files || files.length === 0) {
+        return;
+      }
+
+      // Find old files to delete (exclude current file)
+      const filesToDelete = files
+        .filter(f => f.name !== currentFileName)
+        .map(f => `${categoryId}/${f.name}`);
+
+      if (filesToDelete.length > 0) {
+        console.log('Cleaning up old icons:', filesToDelete);
+        const { error } = await supabase.storage
+          .from(CATEGORY_ICONS_BUCKET)
+          .remove(filesToDelete);
+
+        if (error) {
+          console.warn('Failed to delete old icons:', error);
+        }
+      }
+    } catch (err) {
+      console.warn('Cleanup error:', err);
     }
   }
 

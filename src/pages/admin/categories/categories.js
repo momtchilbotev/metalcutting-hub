@@ -418,13 +418,15 @@ export class AdminCategoriesPage {
 
   async saveCategory() {
     const categoryId = document.getElementById('category_id').value || null;
+    const existingIconUrl = document.getElementById('icon_url').value.trim() || null;
+
     const formData = {
       id: categoryId,
       name_bg: document.getElementById('name_bg').value.trim(),
       name_en: document.getElementById('name_en').value.trim(),
       slug: document.getElementById('slug').value.trim(),
       sort_order: parseInt(document.getElementById('sort_order').value) || 0,
-      icon_url: document.getElementById('icon_url').value.trim() || null
+      icon_url: existingIconUrl
     };
 
     if (!formData.name_bg || !formData.slug) {
@@ -432,31 +434,46 @@ export class AdminCategoriesPage {
       return;
     }
 
-    try {
-      // First save the category to get/create the ID
-      const savedCategory = await adminService.saveCategory(formData);
-      const newCategoryId = savedCategory?.id || categoryId;
+    console.log('Saving category:', { categoryId, hasNewIcon: !!this.selectedIconFile, formData });
 
-      // Upload icon if a new file was selected
-      if (this.selectedIconFile && newCategoryId) {
-        try {
+    try {
+      // For EXISTING categories: upload new icon FIRST before saving
+      if (this.selectedIconFile && categoryId) {
+        console.log('Uploading new icon for existing category...');
+        const iconUrl = await storageService.uploadCategoryIcon(this.selectedIconFile, categoryId);
+        console.log('Icon uploaded, URL:', iconUrl);
+        formData.icon_url = iconUrl;
+        // Single save with the new icon URL
+        const result = await adminService.saveCategory(formData);
+        console.log('Category saved with new icon:', result);
+      } else if (this.selectedIconFile && !categoryId) {
+        // NEW category with icon: need two-step process (create → upload → update)
+        console.log('Creating new category with icon...');
+        const savedCategory = await adminService.saveCategory(formData);
+        const newCategoryId = savedCategory?.id;
+
+        if (newCategoryId) {
+          console.log('New category created, ID:', newCategoryId);
           const iconUrl = await storageService.uploadCategoryIcon(this.selectedIconFile, newCategoryId);
-          // Update category with new icon URL
+          console.log('Icon uploaded for new category, URL:', iconUrl);
           await adminService.saveCategory({
             ...formData,
             id: newCategoryId,
             icon_url: iconUrl
           });
-        } catch (uploadError) {
-          Toast.error('Категорията е записана, но има грешка при качването на иконата.');
-          console.error('Icon upload error:', uploadError);
+          console.log('Category updated with icon URL');
         }
+      } else {
+        // No new icon selected - single save (works for both new and existing)
+        console.log('Saving category without new icon...');
+        await adminService.saveCategory(formData);
       }
 
-      Toast.success(formData.id ? 'Категорията е обновена!' : 'Категорията е създадена!');
+      Toast.success(categoryId ? 'Категорията е обновена!' : 'Категорията е създадена!');
       this.hideForm();
       await this.render();
     } catch (error) {
+      console.error('Save category error:', error);
       Toast.error(error.message || 'Грешка при запазване.');
     }
   }
