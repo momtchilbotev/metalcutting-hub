@@ -252,6 +252,10 @@ export class ListingDetailsPage {
             </div>
           </div>
         ` : ''}
+
+        <div class="text-center mt-4">
+          <a href="/my-listings" class="text-decoration-none">← Назад към моите обяви</a>
+        </div>
       </div>
     `;
   }
