@@ -192,15 +192,20 @@ export class ProfilePage {
               <div class="card-body">
                 <form id="password-form">
                   <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
+                      <label for="current_password" class="form-label">Текуща парола</label>
+                      <input type="password" class="form-control" id="current_password" name="current_password"
+                        placeholder="Въведете текущата парола" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
                       <label for="new_password" class="form-label">Нова парола</label>
                       <input type="password" class="form-control" id="new_password" name="new_password"
-                        placeholder="Минимум 6 символа">
+                        placeholder="Минимум 6 символа" required>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-4 mb-3">
                       <label for="confirm_password" class="form-label">Потвърди парола</label>
                       <input type="password" class="form-control" id="confirm_password" name="confirm_password"
-                        placeholder="Повторете паролата">
+                        placeholder="Повторете паролата" required>
                     </div>
                   </div>
                   <button type="submit" class="btn btn-outline-primary">
@@ -335,8 +340,14 @@ export class ProfilePage {
   }
 
   async changePassword() {
+    const currentPassword = document.getElementById('current_password').value;
     const newPassword = document.getElementById('new_password').value;
     const confirmPassword = document.getElementById('confirm_password').value;
+
+    if (!currentPassword) {
+      Toast.error('Моля, въведете текущата парола.');
+      return;
+    }
 
     if (!newPassword || newPassword.length < 6) {
       Toast.error('Паролата трябва да е поне 6 символа.');
@@ -348,9 +359,17 @@ export class ProfilePage {
       return;
     }
 
+    // Verify current password
+    const isValid = await authService.verifyPassword(currentPassword);
+    if (!isValid) {
+      Toast.error('Текущата парола е грешна.');
+      return;
+    }
+
     try {
       await authService.updatePassword(newPassword);
       Toast.success('Паролата е променена успешно!');
+      document.getElementById('current_password').value = '';
       document.getElementById('new_password').value = '';
       document.getElementById('confirm_password').value = '';
     } catch (error) {

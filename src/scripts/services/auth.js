@@ -250,6 +250,35 @@ export class AuthService {
   }
 
   /**
+   * Verify current password
+   * @param {string} currentPassword - Current password to verify
+   * @returns {Promise<boolean>} - True if password is correct
+   */
+  async verifyPassword(currentPassword) {
+    try {
+      const user = await this.getUser();
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      // Try to sign in with the current password to verify it
+      const { error } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword
+      });
+
+      if (error) {
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Verify password error:', error);
+      return false;
+    }
+  }
+
+  /**
    * Update password
    * @param {string} newPassword - New password
    * @returns {Promise<void>}
