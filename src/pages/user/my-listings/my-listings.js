@@ -239,6 +239,17 @@ export class MyListingsPage {
       `;
     }
 
+    // Special message for draft listings
+    if (this.statusFilter === 'draft') {
+      return `
+        <div class="text-center py-5">
+          <i class="bi bi-file-earmark-text display-1 text-muted"></i>
+          <h4 class="mt-3">Нямате чернови</h4>
+          <p class="text-muted">Незапазените обяви се съхраняват като чернови</p>
+        </div>
+      `;
+    }
+
     return `
       <div class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
