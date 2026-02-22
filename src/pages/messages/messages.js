@@ -1,8 +1,8 @@
 import './messages.css';
-import { authService } from '../../../scripts/services/auth.js';
-import { Toast } from '../../../scripts/components/Toast.js';
-import { formatDate } from '../../../scripts/utils/formatters.js';
-import { supabase } from '../../../scripts/utils/supabaseClient.js';
+import { authService } from '../../scripts/services/auth.js';
+import { Toast } from '../../scripts/components/Toast.js';
+import { formatDate } from '../../scripts/utils/formatters.js';
+import { supabase } from '../../scripts/utils/supabaseClient.js';
 
 export class MessagesPage {
   constructor(containerId, params = {}) {
