@@ -218,6 +218,17 @@ export class MyListingsPage {
   }
 
   getEmptyTemplate() {
+    // Special message for expired listings
+    if (this.statusFilter === 'expired') {
+      return `
+        <div class="text-center py-5">
+          <i class="bi bi-clock display-1 text-muted"></i>
+          <h4 class="mt-3">Нямате изтекли обяви</h4>
+          <p class="text-muted">Обява с давност 3 месеца се води изтекла</p>
+        </div>
+      `;
+    }
+
     return `
       <div class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
