@@ -135,6 +135,7 @@ export class ListingCreatePage {
                   <!-- Images -->
                   <div class="mb-4">
                     <label class="form-label">Снимки (до 5)</label>
+                    <div class="form-text mb-2">Първата снимка ще бъде основна.</div>
                     <div id="drop-zone" class="drop-zone p-4 text-center border rounded mb-3">
                       <i class="bi bi-cloud-upload display-4 text-muted"></i>
                       <p class="mb-1">Плъзнете снимки тук или</p>
@@ -190,6 +191,9 @@ export class ListingCreatePage {
               </div>
             </div>
           </div>
+        </div>
+        <div class="text-center mt-4">
+          <a href="/my-listings" class="text-decoration-none">← Назад към моите обяви</a>
         </div>
       </div>
     `;
