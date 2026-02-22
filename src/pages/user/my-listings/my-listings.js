@@ -39,7 +39,12 @@ export class MyListingsPage {
       filters.status = this.statusFilter;
     }
 
-    const result = await listingService.getMyListings(filters);
+    // Load profile to ensure avatar is available in sidebar
+    const [result] = await Promise.all([
+      listingService.getMyListings(filters),
+      authService.getProfile()
+    ]);
+
     this.listings = result.listings;
     this.totalCount = result.count;
   }
