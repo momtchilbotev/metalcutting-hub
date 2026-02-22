@@ -20,7 +20,8 @@ export class ListingListPage {
       condition: params.condition || '',
       minPrice: params.minPrice || '',
       maxPrice: params.maxPrice || '',
-      search: params.q || ''
+      search: params.q || '',
+      sortBy: params.sortBy || 'newest'
     };
   }
 
@@ -79,6 +80,17 @@ export class ListingListPage {
     if (this.filters.search) {
       filterParams.search = this.filters.search;
     }
+
+    // Sorting
+    const sortOptions = {
+      'newest': { order_by: 'created_at', order_direction: 'desc' },
+      'oldest': { order_by: 'created_at', order_direction: 'asc' },
+      'price_asc': { order_by: 'price', order_direction: 'asc' },
+      'price_desc': { order_by: 'price', order_direction: 'desc' }
+    };
+    const sort = sortOptions[this.filters.sortBy] || sortOptions['newest'];
+    filterParams.order_by = sort.order_by;
+    filterParams.order_direction = sort.order_direction;
 
     // Load listings
     const result = await listingService.getListings(filterParams);
@@ -200,9 +212,43 @@ export class ListingListPage {
 
           <!-- Listings Grid -->
           <div class="col-lg-9">
-            <!-- Active Filters -->
-            <div id="active-filters" class="mb-3">
-              ${this.getActiveFiltersTemplate()}
+            <!-- Sorting and Active Filters Row -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <!-- Active Filters -->
+              <div id="active-filters">
+                ${this.getActiveFiltersTemplate()}
+              </div>
+
+              <!-- Sorting Dropdown -->
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="sortDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                  <i class="bi bi-sort-down me-1"></i>
+                  <span id="sort-label">${this.getSortLabel(this.filters.sortBy)}</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="sortDropdown">
+                  <li>
+                    <button class="dropdown-item ${this.filters.sortBy === 'newest' ? 'active' : ''}" type="button" data-sort="newest">
+                      <i class="bi bi-clock me-2"></i>Най-нови
+                    </button>
+                  </li>
+                  <li>
+                    <button class="dropdown-item ${this.filters.sortBy === 'oldest' ? 'active' : ''}" type="button" data-sort="oldest">
+                      <i class="bi bi-clock-history me-2"></i>Най-стари
+                    </button>
+                  </li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li>
+                    <button class="dropdown-item ${this.filters.sortBy === 'price_asc' ? 'active' : ''}" type="button" data-sort="price_asc">
+                      <i class="bi bi-arrow-up me-2"></i>Цена: ниска към висока
+                    </button>
+                  </li>
+                  <li>
+                    <button class="dropdown-item ${this.filters.sortBy === 'price_desc' ? 'active' : ''}" type="button" data-sort="price_desc">
+                      <i class="bi bi-arrow-down me-2"></i>Цена: висока към ниска
+                    </button>
+                  </li>
+                </ul>
+              </div>
             </div>
 
             <!-- Listings -->
@@ -249,6 +295,16 @@ export class ListingListPage {
         `).join('')}
       </div>
     `;
+  }
+
+  getSortLabel(sortBy) {
+    const labels = {
+      'newest': 'Най-нови',
+      'oldest': 'Най-стари',
+      'price_asc': 'Цена: ниска към висока',
+      'price_desc': 'Цена: висока към ниска'
+    };
+    return labels[sortBy] || 'Най-нови';
   }
 
   renderListings() {
@@ -347,6 +403,36 @@ export class ListingListPage {
       });
     }
 
+    // Sort dropdown
+    const sortDropdownItems = document.querySelectorAll('[data-sort]');
+    sortDropdownItems.forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const sortBy = item.dataset.sort;
+        this.filters.sortBy = sortBy;
+
+        // Update active state
+        sortDropdownItems.forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+
+        // Update label
+        const sortLabel = document.getElementById('sort-label');
+        if (sortLabel) {
+          sortLabel.textContent = this.getSortLabel(sortBy);
+        }
+
+        // Close dropdown
+        const dropdown = bootstrap.Dropdown.getInstance(document.getElementById('sortDropdown'));
+        if (dropdown) {
+          dropdown.hide();
+        }
+
+        this.applyFilters();
+      });
+    });
+
     // Pagination clicks
     const pagination = document.getElementById('pagination');
     if (pagination) {
@@ -416,6 +502,7 @@ export class ListingListPage {
     if (minPrice) params.minPrice = minPrice;
     if (maxPrice) params.maxPrice = maxPrice;
     if (this.currentPage > 1) params.page = this.currentPage;
+    if (this.filters.sortBy && this.filters.sortBy !== 'newest') params.sortBy = this.filters.sortBy;
 
     window.router.navigate('/listings', params);
   }
