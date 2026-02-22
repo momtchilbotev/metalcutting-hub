@@ -92,6 +92,12 @@ const routes = {
     title: 'Audit Log - Admin',
     template: '/pages/admin/audit/audit.html',
     guard: () => adminGuard('admin')
+  },
+  '/admin/reports': {
+    page: () => import('../pages/admin/reports/reports.js'),
+    title: 'Reports - Admin',
+    template: '/pages/admin/reports/reports.html',
+    guard: () => adminGuard('admin')
   }
 };
 

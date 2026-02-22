@@ -8,13 +8,17 @@ export class AdminDashboardPage {
     this.container = document.getElementById(containerId);
     this.params = params;
     this.stats = null;
+    this.pendingReports = 0;
   }
 
   async render() {
     this.container.innerHTML = this.getLoadingTemplate();
 
     try {
-      this.stats = await adminService.getDashboardStats();
+      [this.stats, this.pendingReports] = await Promise.all([
+        adminService.getDashboardStats(),
+        adminService.getPendingReportsCount()
+      ]);
       this.container.innerHTML = this.getTemplate();
       this.attachEventListeners();
     } catch (error) {
@@ -111,6 +115,25 @@ export class AdminDashboardPage {
               </div>
             </div>
           </div>
+
+          <div class="col-md-6 col-lg-3">
+            <a href="/admin/reports" class="text-decoration-none">
+              <div class="card shadow-sm admin-stat-card ${this.pendingReports > 0 ? 'border-danger' : ''}">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-1">Доклади</h6>
+                      <h3 class="mb-0 ${this.pendingReports > 0 ? 'text-danger' : ''}">${formatNumber(this.pendingReports)}</h3>
+                    </div>
+                    <div class="${this.pendingReports > 0 ? 'bg-danger' : 'bg-secondary'} bg-opacity-10 p-3 rounded">
+                      <i class="bi bi-flag ${this.pendingReports > 0 ? 'text-danger' : 'text-secondary'} fs-4"></i>
+                    </div>
+                  </div>
+                  ${this.pendingReports > 0 ? '<small class="text-danger">Нови доклади!</small>' : ''}
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
 
         <!-- Quick Actions -->
@@ -132,6 +155,9 @@ export class AdminDashboardPage {
                   </a>
                   <a href="/admin/categories" class="btn btn-outline-primary">
                     <i class="bi bi-tags me-2"></i>Управление на категории
+                  </a>
+                  <a href="/admin/reports" class="btn ${this.pendingReports > 0 ? 'btn-outline-danger' : 'btn-outline-primary'}">
+                    <i class="bi bi-flag me-2"></i>Доклади ${this.pendingReports > 0 ? `<span class="badge bg-danger ms-1">${this.pendingReports}</span>` : ''}
                   </a>
                   <a href="/admin/audit" class="btn btn-outline-secondary">
                     <i class="bi bi-clipboard-check me-2"></i>Audit Log

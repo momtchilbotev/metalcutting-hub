@@ -154,6 +154,12 @@ export class ListingDetailsPage {
                   <button class="btn btn-primary btn-lg" id="contact-seller-btn">
                     <i class="bi bi-chat-dots me-2"></i>Свържете се с продавача
                   </button>
+                  <button class="btn btn-outline-success" id="show-phone-btn">
+                    <i class="bi bi-telephone me-2"></i>Покажи телефон
+                  </button>
+                  <button class="btn btn-outline-danger" id="report-btn">
+                    <i class="bi bi-flag me-2"></i>Докладвай нередност
+                  </button>
                   <div class="btn-group">
                     <button class="btn btn-outline-primary" id="watchlist-btn">
                       <i class="bi bi-heart${this.isInWatchlist ? '-fill text-danger' : ''} me-1"></i>
@@ -191,6 +197,33 @@ export class ListingDetailsPage {
                 <a href="/messages?to=${listing.user_id}" class="btn btn-outline-primary btn-sm mt-3 w-100">
                   <i class="bi bi-envelope me-1"></i>Изпрати съобщение
                 </a>
+              </div>
+            </div>
+
+            <!-- Security Tips Card -->
+            <div class="card shadow-sm mt-3 border-warning">
+              <div class="card-body">
+                <h5 class="card-title text-warning">
+                  <i class="bi bi-shield-check me-2"></i>Съвети за безопасност
+                </h5>
+                <ul class="list-unstyled mb-0 small">
+                  <li class="mb-2">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    Срещнете се на публично място
+                  </li>
+                  <li class="mb-2">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    Проверете стоката преди плащане
+                  </li>
+                  <li class="mb-2">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    Не плащайте предварително
+                  </li>
+                  <li class="mb-0">
+                    <i class="bi bi-check-circle-fill text-success me-2"></i>
+                    Използвайте сигурни методи за плащане
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
@@ -282,6 +315,18 @@ export class ListingDetailsPage {
     if (shareBtn) {
       shareBtn.addEventListener('click', () => this.shareListing());
     }
+
+    // Show phone
+    const showPhoneBtn = document.getElementById('show-phone-btn');
+    if (showPhoneBtn) {
+      showPhoneBtn.addEventListener('click', () => this.showPhone());
+    }
+
+    // Report
+    const reportBtn = document.getElementById('report-btn');
+    if (reportBtn) {
+      reportBtn.addEventListener('click', () => this.reportListing());
+    }
   }
 
   async contactSeller() {
@@ -337,6 +382,51 @@ export class ListingDetailsPage {
       } else {
         Toast.error('Грешка при копиране на линка.');
       }
+    }
+  }
+
+  async showPhone() {
+    const phone = this.listing.profiles?.phone;
+
+    if (!phone) {
+      Toast.info('Продавачът не е предоставил телефонен номер.');
+      return;
+    }
+
+    const showPhoneBtn = document.getElementById('show-phone-btn');
+    if (showPhoneBtn) {
+      showPhoneBtn.innerHTML = `<i class="bi bi-telephone me-2"></i><a href="tel:${phone}" class="text-success text-decoration-none">${phone}</a>`;
+      showPhoneBtn.classList.remove('btn-outline-success');
+      showPhoneBtn.classList.add('btn-success');
+    }
+  }
+
+  async reportListing() {
+    // Check if user is logged in
+    const { authService } = await import('../../../scripts/services/auth.js');
+    const user = await authService.getUser();
+
+    if (!user) {
+      Toast.warning('Моля, влезте в профила си за да докладвате нередност.');
+      window.router.navigate('/login', { redirect: window.location.pathname + window.location.search });
+      return;
+    }
+
+    // Check if already reported
+    const hasReported = await listingService.hasReportedListing(this.listingId);
+    if (hasReported) {
+      Toast.info('Вече сте докладвали тази обява.');
+      return;
+    }
+
+    const reason = prompt('Моля, опишете нередността:');
+    if (!reason) return;
+
+    try {
+      await listingService.reportListing(this.listingId, reason);
+      Toast.success('Благодарим ви! Докладът е изпратен.');
+    } catch (error) {
+      Toast.error(error.message || 'Грешка при изпращане на доклада.');
     }
   }
 

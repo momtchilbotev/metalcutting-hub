@@ -1,0 +1,15 @@
+/* Admin Reports Page Styles */
+
+.report-reason {
+  display: inline-block;
+  max-width: 200px;
+  cursor: help;
+}
+
+.table-warning {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+}
+
+.table-hover .table-warning:hover {
+  background-color: rgba(255, 193, 7, 0.2) !important;
+}

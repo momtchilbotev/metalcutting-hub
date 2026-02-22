@@ -328,6 +328,104 @@ export class AdminService {
   }
 
   /**
+   * Get all reports with filters
+   * @param {Object} filters - Filter options
+   * @returns {Promise<Object>}
+   */
+  async getReports(filters = {}) {
+    try {
+      let query = supabase
+        .from('reports')
+        .select(`
+          *,
+          listing:listings(id, title, status),
+          reporter:profiles!reports_reporter_id_fkey(id, full_name, email),
+          reviewer:profiles!reports_reviewed_by_fkey(id, full_name)
+        `, { count: 'exact' })
+        .order('created_at', { ascending: false });
+
+      if (filters.status) {
+        query = query.eq('status', filters.status);
+      }
+
+      if (filters.page && filters.items_per_page) {
+        const from = (filters.page - 1) * filters.items_per_page;
+        const to = from + filters.items_per_page - 1;
+        query = query.range(from, to);
+      }
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      return {
+        reports: data || [],
+        count: count || 0,
+        page: filters.page || 1,
+        itemsPerPage: filters.items_per_page || 20
+      };
+    } catch (error) {
+      console.error('Get reports error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update report status
+   * @param {string} reportId - Report ID
+   * @param {string} status - New status ('reviewed', 'resolved', 'dismissed')
+   * @param {string} notes - Admin notes
+   * @returns {Promise<void>}
+   */
+  async updateReportStatus(reportId, status, notes = '') {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const updateData = {
+        status,
+        reviewed_by: user.id,
+        reviewed_at: new Date().toISOString()
+      };
+
+      if (notes) {
+        updateData.admin_notes = notes;
+      }
+
+      const { error } = await supabase
+        .from('reports')
+        .update(updateData)
+        .eq('id', reportId);
+
+      if (error) throw error;
+
+      await this._logAction(user.id, 'update_report', 'report', reportId, { status, notes });
+    } catch (error) {
+      console.error('Update report status error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get pending reports count
+   * @returns {Promise<number>}
+   */
+  async getPendingReportsCount() {
+    try {
+      const { count, error } = await supabase
+        .from('reports')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      if (error) throw error;
+      return count || 0;
+    } catch (error) {
+      console.error('Get pending reports count error:', error);
+      return 0;
+    }
+  }
+
+  /**
    * Create or update category
    * @param {Object} categoryData - Category data
    * @returns {Promise<Object>}

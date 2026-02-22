@@ -517,6 +517,67 @@ export class ListingService {
       status: 'active'
     });
   }
+
+  /**
+   * Report a listing
+   * @param {string} listingId - Listing ID
+   * @param {string} reason - Reason for report
+   * @returns {Promise<Object>} - Created report
+   */
+  async reportListing(listingId, reason) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      const { data, error } = await supabase
+        .from('reports')
+        .insert([{
+          listing_id: listingId,
+          reporter_id: user.id,
+          reason: reason
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        if (error.code === '23505') {
+          throw new Error('Вече сте докладвали тази обява.');
+        }
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      console.error('Report listing error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Check if user has already reported a listing
+   * @param {string} listingId - Listing ID
+   * @returns {Promise<boolean>}
+   */
+  async hasReportedListing(listingId) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return false;
+
+      const { data, error } = await supabase
+        .from('reports')
+        .select('id')
+        .eq('reporter_id', user.id)
+        .eq('listing_id', listingId)
+        .maybeSingle();
+
+      if (error) return false;
+      return !!data;
+    } catch (error) {
+      return false;
+    }
+  }
 }
 
 // Export singleton instance
