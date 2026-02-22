@@ -145,7 +145,7 @@ export class ListingDetailsPage {
 
                 <!-- Stats -->
                 <div class="d-flex gap-4 text-muted small mb-4">
-                  <span><i class="bi bi-eye me-1"></i> ${listing.views || 0} прегледа</span>
+                  <span><i class="bi bi-eye me-1"></i> ${listing.views_count || 0} прегледа</span>
                   <span><i class="bi bi-calendar me-1"></i> ${formatDate(listing.created_at)}</span>
                 </div>
 

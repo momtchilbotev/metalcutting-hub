@@ -177,7 +177,7 @@ export class MyListingsPage {
                       ${formatStatus(listing.status)}
                     </span>
                     <small class="text-muted">
-                      <i class="bi bi-eye me-1"></i>${listing.views || 0} прегледа
+                      <i class="bi bi-eye me-1"></i>${listing.views_count || 0} прегледа
                     </small>
                   </div>
                 </div>
