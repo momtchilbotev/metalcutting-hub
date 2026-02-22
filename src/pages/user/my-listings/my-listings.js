@@ -229,6 +229,16 @@ export class MyListingsPage {
       `;
     }
 
+    // Special message for sold listings
+    if (this.statusFilter === 'sold') {
+      return `
+        <div class="text-center py-5">
+          <i class="bi bi-check-circle display-1 text-muted"></i>
+          <h4 class="mt-3">Нямате продадени обяви</h4>
+        </div>
+      `;
+    }
+
     return `
       <div class="text-center py-5">
         <i class="bi bi-inbox display-1 text-muted"></i>
