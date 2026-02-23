@@ -28,6 +28,11 @@ export class Navbar {
       // Get the actual role to differentiate between admin and moderator
       this.userRole = await this.getUserRole();
       this.isModeratorOnlyUser = this.userRole === 'moderator';
+    } else {
+      // Reset role when user is logged out
+      this.isAdminUser = false;
+      this.isModeratorOnlyUser = false;
+      this.userRole = 'user';
     }
 
     this.container.innerHTML = this.getTemplate();
@@ -114,7 +119,7 @@ export class Navbar {
       return `
         <li class="nav-item">
           <a class="nav-link" href="/admin">
-            <i class="bi bi-shield-lock"></i> Admin
+            <i class="bi bi-shield-lock"></i> Администратор
           </a>
         </li>
       `;
@@ -123,7 +128,7 @@ export class Navbar {
       return `
         <li class="nav-item">
           <a class="nav-link" href="/moderator">
-            <i class="bi bi-shield-check"></i> Moderator
+            <i class="bi bi-shield-check"></i> Модератор
           </a>
         </li>
       `;

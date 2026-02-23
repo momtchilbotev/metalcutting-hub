@@ -44,7 +44,7 @@ export class AdminDashboardPage {
         <div class="row mb-4">
           <div class="col">
             <h2 class="h3 mb-0">
-              <i class="bi bi-speedometer2 text-primary me-2"></i>Admin Dashboard
+              <i class="bi bi-speedometer2 text-primary me-2"></i>Панел на администратора
             </h2>
             <p class="text-muted">Управление на Metalcutting Hub</p>
           </div>
