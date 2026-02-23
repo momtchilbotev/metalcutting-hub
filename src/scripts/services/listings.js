@@ -157,6 +157,28 @@ export class ListingService {
   }
 
   /**
+   * Get current user's role
+   * @returns {Promise<string>} - User role ('user', 'moderator', 'admin')
+   */
+  async getUserRole() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return 'user';
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      return profile?.role || 'user';
+    } catch (error) {
+      console.error('Get user role error:', error);
+      return 'user';
+    }
+  }
+
+  /**
    * Create a new listing
    * @param {Object} listingData - Listing data
    * @param {File[]} images - Array of image files
@@ -170,13 +192,31 @@ export class ListingService {
         throw new Error('Not authenticated');
       }
 
+      // Get user role to determine initial status
+      const userRole = await this.getUserRole();
+      const roleHierarchy = { user: 0, moderator: 1, admin: 2 };
+
+      // Determine status based on role:
+      // - Regular users: always 'pending' (unless explicitly saving as draft)
+      // - Moderators/Admins: can publish directly (auto-approve)
+      let status = listingData.status;
+      if (status !== 'draft') {
+        if (roleHierarchy[userRole] >= roleHierarchy.moderator) {
+          // Staff can publish directly
+          status = status || 'active';
+        } else {
+          // Regular users need approval
+          status = 'pending';
+        }
+      }
+
       // Create listing first
       const { data: listing, error: listingError } = await supabase
         .from('listings')
         .insert([{
           ...listingData,
           user_id: user.id,
-          status: listingData.status || 'active',
+          status,
           expires_at: listingData.expires_at || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
         }])
         .select()
@@ -516,6 +556,62 @@ export class ListingService {
       expires_at: newExpiry,
       status: 'active'
     });
+  }
+
+  /**
+   * Resubmit a rejected listing for approval
+   * @param {string} id - Listing ID
+   * @param {Object} updates - Optional updates to apply
+   * @returns {Promise<Object>} - Updated listing
+   */
+  async resubmitListing(id, updates = {}) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('Not authenticated');
+      }
+
+      // Verify ownership and current status
+      const { data: existing } = await supabase
+        .from('listings')
+        .select('user_id, status')
+        .eq('id', id)
+        .single();
+
+      if (!existing) {
+        throw new Error('Listing not found');
+      }
+
+      if (existing.user_id !== user.id) {
+        throw new Error('Not authorized');
+      }
+
+      if (existing.status !== 'rejected') {
+        throw new Error('Only rejected listings can be resubmitted');
+      }
+
+      // Update listing to pending and clear rejection data
+      const { data, error } = await supabase
+        .from('listings')
+        .update({
+          ...updates,
+          status: 'pending',
+          rejection_reason: null,
+          reviewed_by: null,
+          reviewed_at: null,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return data;
+    } catch (error) {
+      console.error('Resubmit listing error:', error);
+      throw error;
+    }
   }
 
   /**

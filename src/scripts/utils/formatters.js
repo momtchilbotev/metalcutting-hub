@@ -156,7 +156,9 @@ export function formatStatus(status) {
     'active': 'Активна',
     'sold': 'Продадена',
     'draft': 'Чернова',
-    'expired': 'Изтекла'
+    'expired': 'Изтекла',
+    'pending': 'Чакаща одобрение',
+    'rejected': 'Отхвърлена'
   };
   return statuses[status] || status;
 }

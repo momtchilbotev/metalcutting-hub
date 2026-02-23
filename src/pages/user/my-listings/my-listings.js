@@ -110,20 +110,26 @@ export class MyListingsPage {
 
             <!-- Filters -->
             <div class="mb-3">
-              <div class="btn-group" role="group">
+              <div class="btn-group flex-wrap" role="group">
                 <a href="/my-listings" class="btn btn-outline-primary ${!this.statusFilter ? 'active' : ''}">
                   Всички
+                </a>
+                <a href="/my-listings?status=pending" class="btn btn-outline-warning ${this.statusFilter === 'pending' ? 'active' : ''}">
+                  Чакащи
                 </a>
                 <a href="/my-listings?status=active" class="btn btn-outline-primary ${this.statusFilter === 'active' ? 'active' : ''}">
                   Активни
                 </a>
-                <a href="/my-listings?status=draft" class="btn btn-outline-primary ${this.statusFilter === 'draft' ? 'active' : ''}">
+                <a href="/my-listings?status=draft" class="btn btn-outline-secondary ${this.statusFilter === 'draft' ? 'active' : ''}">
                   Чернови
                 </a>
-                <a href="/my-listings?status=sold" class="btn btn-outline-primary ${this.statusFilter === 'sold' ? 'active' : ''}">
+                <a href="/my-listings?status=rejected" class="btn btn-outline-danger ${this.statusFilter === 'rejected' ? 'active' : ''}">
+                  Отхвърлени
+                </a>
+                <a href="/my-listings?status=sold" class="btn btn-outline-info ${this.statusFilter === 'sold' ? 'active' : ''}">
                   Продадени
                 </a>
-                <a href="/my-listings?status=expired" class="btn btn-outline-primary ${this.statusFilter === 'expired' ? 'active' : ''}">
+                <a href="/my-listings?status=expired" class="btn btn-outline-secondary ${this.statusFilter === 'expired' ? 'active' : ''}">
                   Изтекли
                 </a>
               </div>
@@ -147,6 +153,12 @@ export class MyListingsPage {
   getListTemplate() {
     return this.listings.map(listing => `
       <div class="card shadow-sm mb-3 listing-item" data-id="${listing.id}">
+        ${listing.status === 'rejected' && listing.rejection_reason ? `
+          <div class="alert alert-danger mb-0 rounded-0">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>Отхвърлена:</strong> ${this.escapeHtml(listing.rejection_reason)}
+          </div>
+        ` : ''}
         <div class="card-body">
           <div class="row align-items-center">
             <!-- Image -->
@@ -193,7 +205,12 @@ export class MyListingsPage {
             <!-- Actions -->
             <div class="col-auto">
               <div class="btn-group-vertical btn-group-sm">
-                <a href="/listings/edit?id=${listing.id}" class="btn btn-outline-primary">
+                ${listing.status === 'rejected' ? `
+                  <button class="btn btn-success btn-resubmit" data-id="${listing.id}" title="Редактирай и изпрати повторно">
+                    <i class="bi bi-arrow-repeat me-1"></i>
+                  </button>
+                ` : ''}
+                <a href="/listings/edit?id=${listing.id}" class="btn btn-outline-primary" title="Редактирай">
                   <i class="bi bi-pencil"></i>
                 </a>
                 ${listing.status === 'active' ? `
@@ -218,6 +235,28 @@ export class MyListingsPage {
   }
 
   getEmptyTemplate() {
+    // Special message for pending listings
+    if (this.statusFilter === 'pending') {
+      return `
+        <div class="text-center py-5">
+          <i class="bi bi-hourglass-split display-1 text-warning"></i>
+          <h4 class="mt-3">Нямате обяви, чакащи одобрение</h4>
+          <p class="text-muted">Новите обяви ще бъдат прегледани от модератор</p>
+        </div>
+      `;
+    }
+
+    // Special message for rejected listings
+    if (this.statusFilter === 'rejected') {
+      return `
+        <div class="text-center py-5">
+          <i class="bi bi-x-circle display-1 text-danger"></i>
+          <h4 class="mt-3">Нямате отхвърлени обяви</h4>
+          <p class="text-muted">Отхвърлените обяви ще се появят тук</p>
+        </div>
+      `;
+    }
+
     // Special message for expired listings
     if (this.statusFilter === 'expired') {
       return `
@@ -275,7 +314,9 @@ export class MyListingsPage {
       active: 'success',
       draft: 'secondary',
       sold: 'info',
-      expired: 'warning'
+      expired: 'warning',
+      pending: 'warning',
+      rejected: 'danger'
     };
     return classes[status] || 'secondary';
   }
@@ -322,6 +363,11 @@ export class MyListingsPage {
       });
     }
 
+    // Resubmit rejected listings
+    document.querySelectorAll('.btn-resubmit').forEach(btn => {
+      btn.addEventListener('click', () => this.resubmitListing(btn.dataset.id));
+    });
+
     // Mark as sold
     document.querySelectorAll('.btn-mark-sold').forEach(btn => {
       btn.addEventListener('click', () => this.markAsSold(btn.dataset.id));
@@ -335,6 +381,18 @@ export class MyListingsPage {
     // Delete
     document.querySelectorAll('.btn-delete').forEach(btn => {
       btn.addEventListener('click', () => this.deleteListing(btn.dataset.id));
+    });
+  }
+
+  async resubmitListing(listingId) {
+    Toast.confirm('Изпращане на обявата за повторно одобрение?', async () => {
+      try {
+        await listingService.resubmitListing(listingId);
+        Toast.success('Обявата е изпратена за повторно одобрение!');
+        await this.render();
+      } catch (error) {
+        Toast.error(error.message || 'Грешка при изпращане.');
+      }
     });
   }
 

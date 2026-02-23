@@ -145,10 +145,14 @@ export class AdminService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Update listing status
+      // Update listing status with review info
       const { error } = await supabase
         .from('listings')
-        .update({ status: 'active' })
+        .update({
+          status: 'active',
+          reviewed_by: user.id,
+          reviewed_at: new Date().toISOString()
+        })
         .eq('id', listingId);
 
       if (error) throw error;
@@ -162,9 +166,9 @@ export class AdminService {
   }
 
   /**
-   * Reject/delete a listing
+   * Reject a listing with reason
    * @param {string} listingId - Listing ID
-   * @param {string} reason - Reason for rejection
+   * @param {string} reason - Reason for rejection (required)
    * @returns {Promise<void>}
    */
   async rejectListing(listingId, reason = '') {
@@ -172,18 +176,90 @@ export class AdminService {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Soft delete by setting to expired
+      // Get listing info for messaging
+      const { data: listing } = await supabase
+        .from('listings')
+        .select('id, title, user_id, profiles!listings_user_id_fkey(full_name)')
+        .eq('id', listingId)
+        .single();
+
+      // Update listing status to rejected with reason
       const { error } = await supabase
         .from('listings')
-        .update({ status: 'expired' })
+        .update({
+          status: 'rejected',
+          rejection_reason: reason,
+          reviewed_by: user.id,
+          reviewed_at: new Date().toISOString()
+        })
         .eq('id', listingId);
 
       if (error) throw error;
+
+      // Send rejection message to the user if reason provided
+      if (reason && listing) {
+        await this.sendRejectionMessage(listingId, listing.user_id, listing.title, reason);
+      }
 
       await this._logAction(user.id, 'reject_listing', 'listing', listingId, { reason });
     } catch (error) {
       console.error('Reject listing error:', error);
       throw error;
+    }
+  }
+
+  /**
+   * Send rejection message to listing owner
+   * @param {string} listingId - Listing ID
+   * @param {string} ownerId - Listing owner's user ID
+   * @param {string} listingTitle - Listing title
+   * @param {string} reason - Rejection reason
+   * @returns {Promise<void>}
+   */
+  async sendRejectionMessage(listingId, ownerId, listingTitle, reason) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const messageContent = `Вашата обява "${listingTitle}" беше отхвърлена.\n\nПричина: ${reason}\n\nМожете да редактирате обявата и да я изпратите повторно за одобрение.`;
+
+      // Create a conversation first
+      const { data: conversation, error: convError } = await supabase
+        .from('conversations')
+        .insert([{
+          listing_id: listingId
+        }])
+        .select()
+        .single();
+
+      if (convError) throw convError;
+
+      // Add both users to the conversation
+      await supabase.from('conversation_participants').insert([
+        { conversation_id: conversation.id, user_id: user.id },
+        { conversation_id: conversation.id, user_id: ownerId }
+      ]);
+
+      // Send the message
+      const { error: msgError } = await supabase
+        .from('messages')
+        .insert([{
+          conversation_id: conversation.id,
+          sender_id: user.id,
+          content: messageContent
+        }]);
+
+      if (msgError) throw msgError;
+
+      // Update conversation's updated_at
+      await supabase
+        .from('conversations')
+        .update({ updated_at: new Date().toISOString() })
+        .eq('id', conversation.id);
+
+    } catch (error) {
+      console.error('Send rejection message error:', error);
+      // Don't throw - message failure shouldn't block rejection
     }
   }
 
@@ -452,6 +528,25 @@ export class AdminService {
       return count || 0;
     } catch (error) {
       console.error('Get pending reports count error:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Get pending listings count (for approval)
+   * @returns {Promise<number>}
+   */
+  async getPendingListingsCount() {
+    try {
+      const { count, error } = await supabase
+        .from('listings')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+      if (error) throw error;
+      return count || 0;
+    } catch (error) {
+      console.error('Get pending listings count error:', error);
       return 0;
     }
   }

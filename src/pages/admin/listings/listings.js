@@ -15,6 +15,7 @@ export class AdminListingsPage {
       status: params.status || '',
       search: params.search || ''
     };
+    this.rejectListingId = null;
   }
 
   async render() {
@@ -76,8 +77,10 @@ export class AdminListingsPage {
               <div class="col-md-3">
                 <select class="form-select" id="status" name="status">
                   <option value="">Всички статуси</option>
+                  <option value="pending" ${this.filters.status === 'pending' ? 'selected' : ''}>Чакащи одобрение</option>
                   <option value="active" ${this.filters.status === 'active' ? 'selected' : ''}>Активни</option>
                   <option value="draft" ${this.filters.status === 'draft' ? 'selected' : ''}>Чернови</option>
+                  <option value="rejected" ${this.filters.status === 'rejected' ? 'selected' : ''}>Отхвърлени</option>
                   <option value="sold" ${this.filters.status === 'sold' ? 'selected' : ''}>Продадени</option>
                   <option value="expired" ${this.filters.status === 'expired' ? 'selected' : ''}>Изтекли</option>
                 </select>
@@ -132,6 +135,7 @@ export class AdminListingsPage {
                       <span class="badge bg-${this.getStatusBadgeClass(listing.status)}">
                         ${formatStatus(listing.status)}
                       </span>
+                      ${listing.rejection_reason ? `<br><small class="text-danger">${this.escapeHtml(listing.rejection_reason.substring(0, 50))}${listing.rejection_reason.length > 50 ? '...' : ''}</small>` : ''}
                     </td>
                     <td><small>${formatDate(listing.created_at)}</small></td>
                     <td>
@@ -141,14 +145,16 @@ export class AdminListingsPage {
                           title="${listing.is_featured ? 'Премахни от препоръчани' : 'Направи препоръчано'}">
                           <i class="bi bi-star${listing.is_featured ? '-fill' : ''}"></i>
                         </button>
-                        ${listing.status === 'draft' ? `
+                        ${listing.status === 'pending' || listing.status === 'draft' ? `
                           <button class="btn btn-outline-success btn-approve" data-id="${listing.id}" title="Одобри">
                             <i class="bi bi-check"></i>
                           </button>
                         ` : ''}
-                        <button class="btn btn-outline-danger btn-reject" data-id="${listing.id}" title="Отхвърли">
-                          <i class="bi bi-x"></i>
-                        </button>
+                        ${listing.status === 'pending' || listing.status === 'active' || listing.status === 'draft' ? `
+                          <button class="btn btn-outline-danger btn-reject" data-id="${listing.id}" title="Отхвърли">
+                            <i class="bi bi-x"></i>
+                          </button>
+                        ` : ''}
                       </div>
                     </td>
                   </tr>
@@ -162,6 +168,31 @@ export class AdminListingsPage {
         <nav class="mt-4">
           ${this.getPaginationTemplate()}
         </nav>
+
+        <!-- Rejection Modal -->
+        <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="rejectModalLabel">
+                  <i class="bi bi-exclamation-triangle text-danger me-2"></i>Отхвърляне на обява
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <p class="text-muted">Моля, посочете причината за отхвърляне. Тя ще бъде изпратена на потребителя.</p>
+                <textarea class="form-control" id="rejection-reason" rows="4"
+                  placeholder="Напр: Обявата не отговаря на правилата на сайта..." required></textarea>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отказ</button>
+                <button type="button" class="btn btn-danger" id="confirm-reject" disabled>
+                  <i class="bi bi-x me-1"></i>Отхвърли
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -171,7 +202,9 @@ export class AdminListingsPage {
       active: 'success',
       draft: 'secondary',
       sold: 'info',
-      expired: 'warning'
+      expired: 'warning',
+      pending: 'warning',
+      rejected: 'danger'
     };
     return classes[status] || 'secondary';
   }
@@ -195,6 +228,9 @@ export class AdminListingsPage {
   attachEventListeners() {
     const filterForm = document.getElementById('filter-form');
     const clearFiltersBtn = document.getElementById('clear-filters');
+    const rejectModal = document.getElementById('rejectModal');
+    const rejectionReason = document.getElementById('rejection-reason');
+    const confirmRejectBtn = document.getElementById('confirm-reject');
 
     // Filter form
     if (filterForm) {
@@ -221,10 +257,31 @@ export class AdminListingsPage {
       btn.addEventListener('click', () => this.approveListing(btn.dataset.id));
     });
 
-    // Reject
+    // Reject - open modal
     document.querySelectorAll('.btn-reject').forEach(btn => {
-      btn.addEventListener('click', () => this.rejectListing(btn.dataset.id));
+      btn.addEventListener('click', () => this.openRejectModal(btn.dataset.id));
     });
+
+    // Rejection reason textarea - enable/disable confirm button
+    if (rejectionReason) {
+      rejectionReason.addEventListener('input', () => {
+        confirmRejectBtn.disabled = rejectionReason.value.trim().length < 5;
+      });
+    }
+
+    // Confirm reject button
+    if (confirmRejectBtn) {
+      confirmRejectBtn.addEventListener('click', () => this.confirmReject());
+    }
+
+    // Clear modal on close
+    if (rejectModal) {
+      rejectModal.addEventListener('hidden.bs.modal', () => {
+        rejectionReason.value = '';
+        confirmRejectBtn.disabled = true;
+        this.rejectListingId = null;
+      });
+    }
 
     // Pagination
     document.querySelectorAll('.page-link').forEach(link => {
@@ -270,16 +327,32 @@ export class AdminListingsPage {
     }
   }
 
-  async rejectListing(listingId) {
-    Toast.confirm('Сигурни ли сте, че искате да отхвърлите тази обява?', async () => {
-      try {
-        await adminService.rejectListing(listingId);
-        Toast.success('Обявата е отхвърлена!');
-        await this.render();
-      } catch (error) {
-        Toast.error('Грешка при отхвърляне.');
-      }
-    });
+  openRejectModal(listingId) {
+    this.rejectListingId = listingId;
+    const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
+    modal.show();
+  }
+
+  async confirmReject() {
+    const rejectionReason = document.getElementById('rejection-reason').value.trim();
+
+    if (!this.rejectListingId || rejectionReason.length < 5) {
+      Toast.error('Моля, въведете причина за отхвърляне (минимум 5 символа).');
+      return;
+    }
+
+    try {
+      await adminService.rejectListing(this.rejectListingId, rejectionReason);
+      Toast.success('Обявата е отхвърлена и потребителят е уведомен!');
+
+      // Close modal
+      const modal = bootstrap.Modal.getInstance(document.getElementById('rejectModal'));
+      modal.hide();
+
+      await this.render();
+    } catch (error) {
+      Toast.error('Грешка при отхвърляне.');
+    }
   }
 
   showError() {

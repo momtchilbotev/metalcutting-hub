@@ -13,6 +13,7 @@ export class ListingCreatePage {
     this.locations = [];
     this.selectedImages = [];
     this.primaryImageIndex = 0;
+    this.userRole = 'user';
   }
 
   async render() {
@@ -29,13 +30,15 @@ export class ListingCreatePage {
   }
 
   async loadData() {
-    const [categories, locations] = await Promise.all([
+    const [categories, locations, userRole] = await Promise.all([
       listingService.getCategories(),
-      listingService.getLocations()
+      listingService.getLocations(),
+      listingService.getUserRole()
     ]);
 
     this.categories = categories;
     this.locations = locations;
+    this.userRole = userRole;
   }
 
   getLoadingTemplate() {
@@ -178,7 +181,7 @@ export class ListingCreatePage {
                   <!-- Submit Buttons -->
                   <div class="d-flex gap-2">
                     <button type="submit" class="btn btn-primary flex-grow-1" id="submit-btn">
-                      <i class="bi bi-check-circle me-1"></i> Публикувай
+                      <i class="bi bi-check-circle me-1"></i> ${this.userRole === 'user' ? 'Изпрати за одобрение' : 'Публикувай'}
                     </button>
                     <button type="button" class="btn btn-outline-secondary" id="save-draft-btn">
                       <i class="bi bi-save me-1"></i> Запази чернова
@@ -366,7 +369,7 @@ export class ListingCreatePage {
     this.clearErrors();
 
     // Show loading state
-    const loadingBtn = status === 'active' ? submitBtn : saveDraftBtn;
+    const loadingBtn = status === 'active' || status === 'pending' ? submitBtn : saveDraftBtn;
     loadingBtn.disabled = true;
     loadingBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Запазване...';
 
@@ -377,7 +380,14 @@ export class ListingCreatePage {
         this.selectedImages
       );
 
-      Toast.success(status === 'active' ? 'Обявата е публикувана!' : 'Черновата е запазена!');
+      // Show appropriate success message based on role and status
+      if (status === 'draft') {
+        Toast.success('Черновата е запазена!');
+      } else if (this.userRole === 'user') {
+        Toast.success('Вашата обява е изпратена за одобрение!');
+      } else {
+        Toast.success('Обявата е публикувана!');
+      }
 
       // Navigate to listing details
       window.router.navigate(`/listings/view?id=${listing.id}`);
@@ -385,9 +395,9 @@ export class ListingCreatePage {
       console.error('Create listing error:', error);
       Toast.error(error.message || 'Грешка при създаване на обявата.');
       loadingBtn.disabled = false;
-      loadingBtn.innerHTML = status === 'active'
-        ? '<i class="bi bi-check-circle me-1"></i> Публикувай'
-        : '<i class="bi bi-save me-1"></i> Запази чернова';
+      loadingBtn.innerHTML = this.userRole === 'user'
+        ? '<i class="bi bi-check-circle me-1"></i> Изпрати за одобрение'
+        : '<i class="bi bi-check-circle me-1"></i> Публикувай';
     }
   }
 

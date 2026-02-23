@@ -8,6 +8,7 @@ export class ModeratorDashboardPage {
     this.params = params;
     this.stats = null;
     this.pendingReports = 0;
+    this.pendingListings = 0;
     this.todayActivity = [];
   }
 
@@ -15,9 +16,10 @@ export class ModeratorDashboardPage {
     this.container.innerHTML = this.getLoadingTemplate();
 
     try {
-      [this.stats, this.pendingReports, this.todayActivity] = await Promise.all([
+      [this.stats, this.pendingReports, this.pendingListings, this.todayActivity] = await Promise.all([
         adminService.getDashboardStats(),
         adminService.getPendingReportsCount(),
+        adminService.getPendingListingsCount(),
         adminService.getTodayActivity(20)
       ]);
       this.container.innerHTML = this.getTemplate();
@@ -53,6 +55,25 @@ export class ModeratorDashboardPage {
 
         <!-- Stats Cards -->
         <div class="row g-4 mb-4">
+          <div class="col-md-6 col-lg-3">
+            <a href="/moderator/listings?status=pending" class="text-decoration-none">
+              <div class="card shadow-sm moderator-stat-card ${this.pendingListings > 0 ? 'border-warning' : ''}">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-1">Чакащи одобрение</h6>
+                      <h3 class="mb-0 ${this.pendingListings > 0 ? 'text-warning' : ''}">${formatNumber(this.pendingListings)}</h3>
+                    </div>
+                    <div class="${this.pendingListings > 0 ? 'bg-warning' : 'bg-secondary'} bg-opacity-10 p-3 rounded">
+                      <i class="bi bi-hourglass-split ${this.pendingListings > 0 ? 'text-warning' : 'text-secondary'} fs-4"></i>
+                    </div>
+                  </div>
+                  ${this.pendingListings > 0 ? '<small class="text-warning">Изискват внимание!</small>' : ''}
+                </div>
+              </div>
+            </a>
+          </div>
+
           <div class="col-md-6 col-lg-3">
             <div class="card shadow-sm moderator-stat-card">
               <div class="card-body">
@@ -132,6 +153,9 @@ export class ModeratorDashboardPage {
               </div>
               <div class="card-body">
                 <div class="d-grid gap-2">
+                  <a href="/moderator/listings?status=pending" class="btn ${this.pendingListings > 0 ? 'btn-outline-warning' : 'btn-outline-primary'}">
+                    <i class="bi bi-hourglass-split me-2"></i>Чакащи обяви ${this.pendingListings > 0 ? `<span class="badge bg-warning text-dark ms-1">${this.pendingListings}</span>` : ''}
+                  </a>
                   <a href="/moderator/listings" class="btn btn-outline-primary">
                     <i class="bi bi-list-ul me-2"></i>Управление на обяви
                   </a>
