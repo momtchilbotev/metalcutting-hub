@@ -25,13 +25,13 @@ export class Footer {
                 Намирайте най-добрите оферти за резбофрези, свредла, фрези и други.
               </p>
               <div class="d-flex gap-3">
-                <a href="#" class="text-light text-decoration-none" aria-label="Facebook">
+                <a href="https://www.facebook.com/" class="text-light text-decoration-none" aria-label="Facebook">
                   <i class="bi bi-facebook fs-5"></i>
                 </a>
-                <a href="https://www.linkedin.com/in/momtchil-botev-324b75319" class="text-light text-decoration-none" aria-label="LinkedIn">
+                <a href="https://www.linkedin.com/" class="text-light text-decoration-none" aria-label="LinkedIn">
                   <i class="bi bi-linkedin fs-5"></i>
                 </a>
-                <a href="#" class="text-light text-decoration-none" aria-label="YouTube">
+                <a href="https://www.youtube.com/" class="text-light text-decoration-none" aria-label="YouTube">
                   <i class="bi bi-youtube fs-5"></i>
                 </a>
               </div>
