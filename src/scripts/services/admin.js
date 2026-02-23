@@ -328,6 +328,37 @@ export class AdminService {
   }
 
   /**
+   * Get today's activity log
+   * @param {number} limit - Maximum number of entries
+   * @returns {Promise<Array>}
+   */
+  async getTodayActivity(limit = 20) {
+    try {
+      // Get start of today in ISO format
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayISO = today.toISOString();
+
+      const { data, error } = await supabase
+        .from('admin_audit_log')
+        .select(`
+          *,
+          admin:profiles!admin_audit_log_admin_id_fkey(full_name)
+        `)
+        .gte('created_at', todayISO)
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+
+      return data || [];
+    } catch (error) {
+      console.error('Get today activity error:', error);
+      return [];
+    }
+  }
+
+  /**
    * Get all reports with filters
    * @param {Object} filters - Filter options
    * @returns {Promise<Object>}

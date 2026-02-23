@@ -1,6 +1,6 @@
 import './dashboard.css';
 import { adminService } from '../../../scripts/services/admin.js';
-import { formatNumber, formatDate } from '../../../scripts/utils/formatters.js';
+import { formatNumber, formatDate, formatAdminAction, formatTargetType } from '../../../scripts/utils/formatters.js';
 
 export class ModeratorDashboardPage {
   constructor(containerId, params = {}) {
@@ -8,15 +8,17 @@ export class ModeratorDashboardPage {
     this.params = params;
     this.stats = null;
     this.pendingReports = 0;
+    this.todayActivity = [];
   }
 
   async render() {
     this.container.innerHTML = this.getLoadingTemplate();
 
     try {
-      [this.stats, this.pendingReports] = await Promise.all([
+      [this.stats, this.pendingReports, this.todayActivity] = await Promise.all([
         adminService.getDashboardStats(),
-        adminService.getPendingReportsCount()
+        adminService.getPendingReportsCount(),
+        adminService.getTodayActivity(20)
       ]);
       this.container.innerHTML = this.getTemplate();
       this.attachEventListeners();
@@ -172,18 +174,47 @@ export class ModeratorDashboardPage {
           </div>
         </div>
 
-        <!-- Recent Activity Placeholder -->
+        <!-- Recent Activity -->
         <div class="card shadow-sm">
-          <div class="card-header bg-white">
+          <div class="card-header bg-white d-flex justify-content-between align-items-center">
             <h5 class="mb-0">
-              <i class="bi bi-clock-history me-2"></i>Скорошна активност
+              <i class="bi bi-clock-history me-2"></i>Днешна активност
             </h5>
           </div>
-          <div class="card-body">
-            <p class="text-muted text-center py-4">
-              <i class="bi bi-inbox display-4 d-block mb-2"></i>
-              Скорошната активност ще се показва тук
-            </p>
+          <div class="card-body p-0">
+            ${this.todayActivity.length === 0 ? `
+              <p class="text-muted text-center py-4 mb-0">
+                <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                Няма активност днес
+              </p>
+            ` : `
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Час</th>
+                      <th>Админ/Модератор</th>
+                      <th>Действие</th>
+                      <th>Тип</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${this.todayActivity.map(log => `
+                      <tr>
+                        <td><small>${this.formatTime(log.created_at)}</small></td>
+                        <td>${this.escapeHtml(log.admin?.full_name || 'Система')}</td>
+                        <td>
+                          <span class="badge bg-${this.getActionBadgeClass(log.action)}">
+                            ${formatAdminAction(log.action)}
+                          </span>
+                        </td>
+                        <td>${formatTargetType(log.target_type)}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            `}
           </div>
         </div>
       </div>
@@ -192,6 +223,25 @@ export class ModeratorDashboardPage {
 
   attachEventListeners() {
     // Add any necessary event listeners
+  }
+
+  formatTime(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('bg-BG', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  getActionBadgeClass(action) {
+    if (action.includes('delete') || action.includes('reject')) return 'danger';
+    if (action.includes('create') || action.includes('approve')) return 'success';
+    if (action.includes('update') || action.includes('toggle')) return 'warning';
+    return 'secondary';
+  }
+
+  escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 
   showError() {
