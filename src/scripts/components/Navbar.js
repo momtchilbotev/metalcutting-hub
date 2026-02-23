@@ -82,6 +82,10 @@ export class Navbar {
               </li>
             </ul>
 
+            <ul class="navbar-nav mx-auto">
+              ${this.getCenterLinks()}
+            </ul>
+
             <ul class="navbar-nav">
               ${authLinks}
             </ul>
@@ -104,8 +108,31 @@ export class Navbar {
     `;
   }
 
+  getCenterLinks() {
+    // Admin/Moderator links in the center of navbar
+    if (this.userRole === 'admin') {
+      return `
+        <li class="nav-item">
+          <a class="nav-link" href="/admin">
+            <i class="bi bi-shield-lock"></i> Admin
+          </a>
+        </li>
+      `;
+    }
+    if (this.userRole === 'moderator') {
+      return `
+        <li class="nav-item">
+          <a class="nav-link" href="/moderator">
+            <i class="bi bi-shield-check"></i> Moderator
+          </a>
+        </li>
+      `;
+    }
+    return '';
+  }
+
   getAuthenticatedLinks() {
-    let links = `
+    return `
       <li class="nav-item">
         <a class="nav-link" href="/listings/create">
           <i class="bi bi-plus-circle"></i> Нова обява
@@ -127,29 +154,6 @@ export class Navbar {
         </ul>
       </li>
     `;
-
-    // Show Admin link only for admins (role === 'admin')
-    if (this.userRole === 'admin') {
-      links = `
-        <li class="nav-item">
-          <a class="nav-link" href="/admin">
-            <i class="bi bi-shield-lock"></i> Admin
-          </a>
-        </li>
-      ` + links;
-    }
-    // Show Moderator link only for moderators (role === 'moderator')
-    else if (this.userRole === 'moderator') {
-      links = `
-        <li class="nav-item">
-          <a class="nav-link" href="/moderator">
-            <i class="bi bi-shield-check"></i> Moderator
-          </a>
-        </li>
-      ` + links;
-    }
-
-    return links;
   }
 
   getUserDisplayName() {
