@@ -205,9 +205,14 @@ export class MyListingsPage {
             <!-- Actions -->
             <div class="col-auto">
               <div class="btn-group-vertical btn-group-sm">
+                ${listing.status === 'draft' ? `
+                  <button class="btn btn-success btn-send-approval" data-id="${listing.id}" title="Изпрати за одобрение">
+                    <i class="bi bi-send"></i>
+                  </button>
+                ` : ''}
                 ${listing.status === 'rejected' ? `
-                  <button class="btn btn-success btn-resubmit" data-id="${listing.id}" title="Редактирай и изпрати повторно">
-                    <i class="bi bi-arrow-repeat me-1"></i>
+                  <button class="btn btn-success btn-resubmit" data-id="${listing.id}" title="Изпрати отново">
+                    <i class="bi bi-arrow-repeat"></i>
                   </button>
                 ` : ''}
                 <a href="/listings/edit?id=${listing.id}" class="btn btn-outline-primary" title="Редактирай">
@@ -218,7 +223,7 @@ export class MyListingsPage {
                     <i class="bi bi-check-circle"></i>
                   </button>
                 ` : ''}
-                ${listing.status === 'expired' || listing.status === 'draft' || listing.status === 'sold' ? `
+                ${listing.status === 'expired' || listing.status === 'sold' ? `
                   <button class="btn btn-outline-info btn-renew" data-id="${listing.id}" title="Поднови">
                     <i class="bi bi-arrow-clockwise"></i>
                   </button>
@@ -368,6 +373,11 @@ export class MyListingsPage {
       btn.addEventListener('click', () => this.resubmitListing(btn.dataset.id));
     });
 
+    // Send draft for approval
+    document.querySelectorAll('.btn-send-approval').forEach(btn => {
+      btn.addEventListener('click', () => this.sendForApproval(btn.dataset.id));
+    });
+
     // Mark as sold
     document.querySelectorAll('.btn-mark-sold').forEach(btn => {
       btn.addEventListener('click', () => this.markAsSold(btn.dataset.id));
@@ -390,6 +400,18 @@ export class MyListingsPage {
         await listingService.resubmitListing(listingId);
         Toast.success('Обявата е изпратена за повторно одобрение!');
         await this.render();
+      } catch (error) {
+        Toast.error(error.message || 'Грешка при изпращане.');
+      }
+    });
+  }
+
+  async sendForApproval(listingId) {
+    Toast.confirm('Изпращане на обявата за одобрение?', async () => {
+      try {
+        await listingService.updateListing(listingId, { status: 'pending' });
+        Toast.success('Обявата е изпратена за одобрение!');
+        window.router.navigate('/my-listings?status=pending');
       } catch (error) {
         Toast.error(error.message || 'Грешка при изпращане.');
       }

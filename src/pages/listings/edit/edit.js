@@ -395,8 +395,8 @@ export class ListingEditPage {
 
       Toast.success('Промените са запазени!');
 
-      // Navigate to listing details
-      window.router.navigate(`/listings/view?id=${this.listingId}`);
+      // Navigate to my-listings
+      window.router.navigate('/my-listings');
     } catch (error) {
       console.error('Update listing error:', error);
       Toast.error(error.message || 'Грешка при запазване.');

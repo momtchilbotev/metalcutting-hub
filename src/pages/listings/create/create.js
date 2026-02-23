@@ -389,8 +389,8 @@ export class ListingCreatePage {
         Toast.success('Обявата е публикувана!');
       }
 
-      // Navigate to listing details
-      window.router.navigate(`/listings/view?id=${listing.id}`);
+      // Navigate to my-listings page
+      window.router.navigate('/my-listings');
     } catch (error) {
       console.error('Create listing error:', error);
       Toast.error(error.message || 'Грешка при създаване на обявата.');
