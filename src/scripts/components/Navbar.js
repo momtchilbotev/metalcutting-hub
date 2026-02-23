@@ -1,5 +1,6 @@
 import { authService } from '../services/auth.js';
-import { isAdmin } from '../services/admin.js';
+import { isAdmin, hasRole } from '../services/admin.js';
+import { supabase } from '../utils/supabaseClient.js';
 import { formatPrice } from '../utils/formatters.js';
 
 export class Navbar {
@@ -7,6 +8,8 @@ export class Navbar {
     this.container = document.getElementById(containerId);
     this.currentUser = null;
     this.isAdminUser = false;
+    this.isModeratorOnlyUser = false;
+    this.userRole = 'user';
     this.refreshHandler = this.refresh.bind(this);
 
     // Listen for auth state changes
@@ -18,15 +21,37 @@ export class Navbar {
     const session = await authService.getSession();
     this.currentUser = session?.user || null;
 
-    // Check if admin
+    // Check user role
     if (this.currentUser) {
+      // Check if admin OR moderator (for backward compat with isAdmin)
       this.isAdminUser = await isAdmin();
+      // Get the actual role to differentiate between admin and moderator
+      this.userRole = await this.getUserRole();
+      this.isModeratorOnlyUser = this.userRole === 'moderator';
     }
 
     this.container.innerHTML = this.getTemplate();
 
     // Attach event listeners
     this.attachEventListeners();
+  }
+
+  async getUserRole() {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return 'user';
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      return profile?.role || 'user';
+    } catch (error) {
+      console.error('Get user role error:', error);
+      return 'user';
+    }
   }
 
   getTemplate() {
@@ -103,11 +128,22 @@ export class Navbar {
       </li>
     `;
 
-    if (this.isAdminUser) {
+    // Show Admin link only for admins (role === 'admin')
+    if (this.userRole === 'admin') {
       links = `
         <li class="nav-item">
           <a class="nav-link" href="/admin">
             <i class="bi bi-shield-lock"></i> Admin
+          </a>
+        </li>
+      ` + links;
+    }
+    // Show Moderator link only for moderators (role === 'moderator')
+    else if (this.userRole === 'moderator') {
+      links = `
+        <li class="nav-item">
+          <a class="nav-link" href="/moderator">
+            <i class="bi bi-shield-check"></i> Moderator
           </a>
         </li>
       ` + links;

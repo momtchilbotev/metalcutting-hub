@@ -1,5 +1,6 @@
 import { authService } from './services/auth.js';
 import { adminGuard } from './services/admin.js';
+import { moderatorGuard } from './services/moderator.js';
 
 const routes = {
   '/': {
@@ -98,6 +99,30 @@ const routes = {
     title: 'Reports - Admin',
     template: '/pages/admin/reports/reports.html',
     guard: () => adminGuard('admin')
+  },
+  '/moderator': {
+    page: () => import('../pages/moderator/dashboard/dashboard.js'),
+    title: 'Moderator Panel - Metalcutting Hub',
+    template: '/pages/moderator/dashboard/dashboard.html',
+    guard: () => moderatorGuard()
+  },
+  '/moderator/listings': {
+    page: () => import('../pages/moderator/listings/listings.js'),
+    title: 'Manage Listings - Moderator',
+    template: '/pages/moderator/listings/listings.html',
+    guard: () => moderatorGuard()
+  },
+  '/moderator/categories': {
+    page: () => import('../pages/moderator/categories/categories.js'),
+    title: 'Manage Categories - Moderator',
+    template: '/pages/moderator/categories/categories.html',
+    guard: () => moderatorGuard()
+  },
+  '/moderator/reports': {
+    page: () => import('../pages/moderator/reports/reports.js'),
+    title: 'Reports - Moderator',
+    template: '/pages/moderator/reports/reports.html',
+    guard: () => moderatorGuard()
   }
 };
 

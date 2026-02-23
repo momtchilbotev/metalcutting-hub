@@ -22,7 +22,8 @@
       "mcp__chrome-devtools__wait_for",
       "mcp__chrome-devtools__get_network_request",
       "mcp__chrome-devtools__handle_dialog",
-      "mcp__zai-mcp-server__analyze_image"
+      "mcp__zai-mcp-server__analyze_image",
+      "mcp__chrome-devtools__list_pages"
     ]
   },
   "enableAllProjectMcpServers": true,
