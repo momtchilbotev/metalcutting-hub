@@ -1,7 +1,8 @@
 import '../../../pages/admin/listings/listings.css';
 import { adminService } from '../../../scripts/services/admin.js';
+import { listingService } from '../../../scripts/services/listings.js';
 import { Toast } from '../../../scripts/components/Toast.js';
-import { formatPrice, formatDate, formatStatus } from '../../../scripts/utils/formatters.js';
+import { formatPrice, formatDate, formatStatus, formatCondition } from '../../../scripts/utils/formatters.js';
 
 export class ModeratorListingsPage {
   constructor(containerId, params = {}) {
@@ -17,6 +18,7 @@ export class ModeratorListingsPage {
     };
     this.baseRoute = '/moderator/listings';
     this.rejectListingId = null;
+    this.currentListing = null;
   }
 
   async render() {
@@ -123,7 +125,7 @@ export class ModeratorListingsPage {
                 ` : this.listings.map(listing => `
                   <tr>
                     <td>
-                      <a href="/listings/view?id=${listing.id}" target="_blank" class="text-decoration-none">
+                      <a href="javascript:void(0)" class="text-decoration-none listing-link" data-id="${listing.id}">
                         ${this.escapeHtml(listing.title)}
                       </a>
                       ${listing.is_featured ? '<span class="badge bg-warning ms-1">Препоръчано</span>' : ''}
@@ -194,6 +196,32 @@ export class ModeratorListingsPage {
             </div>
           </div>
         </div>
+
+        <!-- Listing Preview Modal -->
+        <div class="modal fade" id="listingModal" tabindex="-1" aria-labelledby="listingModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="listingModalLabel">
+                  <i class="bi bi-eye text-primary me-2"></i>Преглед на обява
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="listing-modal-body">
+                <div class="text-center py-4">
+                  <div class="spinner-border text-primary" role="status"></div>
+                  <p class="mt-2">Зареждане...</p>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
+                <a href="#" id="listing-full-link" target="_blank" class="btn btn-outline-primary">
+                  <i class="bi bi-box-arrow-up-right me-1"></i>Отвори в нов таб
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     `;
   }
@@ -247,6 +275,14 @@ export class ModeratorListingsPage {
         window.router.navigate(this.baseRoute);
       });
     }
+
+    // Listing links - open modal
+    document.querySelectorAll('.listing-link').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        this.openListingModal(link.dataset.id);
+      });
+    });
 
     // Toggle featured
     document.querySelectorAll('.btn-toggle-featured').forEach(btn => {
@@ -332,6 +368,96 @@ export class ModeratorListingsPage {
     this.rejectListingId = listingId;
     const modal = new bootstrap.Modal(document.getElementById('rejectModal'));
     modal.show();
+  }
+
+  async openListingModal(listingId) {
+    const modal = new bootstrap.Modal(document.getElementById('listingModal'));
+    modal.show();
+
+    const modalBody = document.getElementById('listing-modal-body');
+    const fullLink = document.getElementById('listing-full-link');
+
+    // Reset full link and add click handler
+    fullLink.onclick = (e) => {
+      e.preventDefault();
+      window.open(`/listings/view?id=${listingId}`, '_blank');
+    };
+
+    try {
+      const listing = await listingService.getListingById(listingId);
+      this.currentListing = listing;
+
+      // Render listing details
+      modalBody.innerHTML = this.getListingModalContent(listing);
+    } catch (error) {
+      console.error('Error loading listing:', error);
+      modalBody.innerHTML = `
+        <div class="alert alert-danger text-center">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Грешка при зареждане на обявата.
+        </div>
+      `;
+    }
+  }
+
+  getListingModalContent(listing) {
+    // Get primary image or first image
+    const images = listing.listing_images || [];
+    const primaryImage = images.find(img => img.is_primary === true) || images[0];
+    const imageUrl = primaryImage?.url || '/images/placeholder.svg';
+
+    return `
+      <div class="row">
+        <div class="col-md-5 mb-3">
+          <img src="${imageUrl}" class="img-fluid rounded" alt="${this.escapeHtml(listing.title)}"
+            onerror="this.src='/images/placeholder.svg'">
+          ${images.length > 1 ? `<small class="text-muted">+${images.length - 1} още снимки</small>` : ''}
+        </div>
+        <div class="col-md-7">
+          <h5 class="mb-2">${this.escapeHtml(listing.title)}</h5>
+          <p class="text-muted mb-3">${this.escapeHtml(listing.description?.substring(0, 300))}${listing.description?.length > 300 ? '...' : ''}</p>
+
+          <div class="row mb-2">
+            <div class="col-6"><strong>Цена:</strong></div>
+            <div class="col-6">${listing.price ? formatPrice(listing.price) : 'По договаряне'}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6"><strong>Състояние:</strong></div>
+            <div class="col-6">${formatCondition(listing.condition)}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6"><strong>Категория:</strong></div>
+            <div class="col-6">${listing.categories?.name_bg || 'N/A'}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6"><strong>Локация:</strong></div>
+            <div class="col-6">${listing.locations?.name_bg || 'N/A'}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6"><strong>Статус:</strong></div>
+            <div class="col-6"><span class="badge bg-${this.getStatusBadgeClass(listing.status)}">${formatStatus(listing.status)}</span></div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6"><strong>Продавач:</strong></div>
+            <div class="col-6">${this.escapeHtml(listing.profiles?.full_name || 'N/A')}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6"><strong>Създадена:</strong></div>
+            <div class="col-6">${formatDate(listing.created_at)}</div>
+          </div>
+          <div class="row mb-2">
+            <div class="col-6"><strong>Прегледи:</strong></div>
+            <div class="col-6">${listing.views_count || 0}</div>
+          </div>
+          ${listing.rejection_reason ? `
+            <div class="alert alert-danger mt-3 mb-0">
+              <strong>Причина за отхвърляне:</strong><br>
+              ${this.escapeHtml(listing.rejection_reason)}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
   }
 
   async confirmReject() {

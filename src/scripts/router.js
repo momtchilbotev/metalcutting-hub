@@ -306,6 +306,8 @@ class Router {
     if (
       href.startsWith('http') ||
       href.startsWith('//') ||
+      href.startsWith('javascript:') ||
+      href === '#' ||
       link.target === '_blank' ||
       link.hasAttribute('download') ||
       e.ctrlKey ||
