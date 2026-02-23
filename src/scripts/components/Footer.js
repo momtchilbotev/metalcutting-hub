@@ -28,7 +28,7 @@ export class Footer {
                 <a href="#" class="text-light text-decoration-none" aria-label="Facebook">
                   <i class="bi bi-facebook fs-5"></i>
                 </a>
-                <a href="#" class="text-light text-decoration-none" aria-label="LinkedIn">
+                <a href="https://www.linkedin.com/in/momtchil-botev-324b75319" class="text-light text-decoration-none" aria-label="LinkedIn">
                   <i class="bi bi-linkedin fs-5"></i>
                 </a>
                 <a href="#" class="text-light text-decoration-none" aria-label="YouTube">
@@ -52,8 +52,8 @@ export class Footer {
             <div class="col-md-2 col-6">
               <h6 class="mb-3">Категории</h6>
               <ul class="list-unstyled">
-                <li class="mb-2"><a href="/listings?category=metalcutting-tools" class="text-light text-decoration-none">Металорежещи</a></li>
-                <li class="mb-2"><a href="/listings?category=taps" class="text-light text-decoration-none">Резбофрези</a></li>
+                <li class="mb-2"><a href="/listings?category=others" class="text-light text-decoration-none">Други</a></li>
+                <li class="mb-2"><a href="/listings?category=taps" class="text-light text-decoration-none">Метчици</a></li>
                 <li class="mb-2"><a href="/listings?category=drills" class="text-light text-decoration-none">Свредла</a></li>
                 <li class="mb-2"><a href="/listings?category=milling-cutters" class="text-light text-decoration-none">Фрези</a></li>
               </ul>
