@@ -76,6 +76,7 @@ Extends Supabase auth.users with user profile data.
 | Column | Type | Description |
 |--------|------|-------------|
 | `id` | UUID | Primary key (references auth.users) |
+| `email` | VARCHAR | User's email (synced from auth.users) |
 | `full_name` | VARCHAR(100) | User's full name |
 | `phone` | VARCHAR(20) | Contact phone number |
 | `location_id` | UUID | Foreign key to locations |
@@ -194,6 +195,31 @@ Audit trail for admin/moderator actions.
 | `details` | JSONB | Additional action details |
 | `created_at` | TIMESTAMPTZ | Action timestamp |
 
+#### `reports`
+User reports for listings (inappropriate content, scams, etc.).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `listing_id` | UUID | Foreign key to listings |
+| `reporter_id` | UUID | Foreign key to profiles (reporter) |
+| `reason` | TEXT | Reason for the report |
+| `status` | VARCHAR(50) | 'pending', 'reviewed', 'resolved', or 'dismissed' |
+| `reviewed_by` | UUID | Foreign key to profiles (admin who reviewed) |
+| `reviewed_at` | TIMESTAMPTZ | When the report was reviewed |
+| `admin_notes` | TEXT | Internal notes from admin |
+| `created_at` | TIMESTAMPTZ | Report creation timestamp |
+
+### Storage Buckets
+
+Supabase Storage buckets for file uploads:
+
+| Bucket | Public | Size Limit | MIME Types | Purpose |
+|--------|--------|------------|------------|---------|
+| `listing-images` | Yes | 5MB | image/jpeg, image/png, image/webp | Listing photos |
+| `category-icons` | Yes | 2MB | image/jpeg, image/png, image/webp, image/svg+xml | Category icons |
+| `avatars` | Yes | 2MB | image/jpeg, image/png, image/webp, image/gif | User avatars |
+
 ### Entity Relationship Diagram
 
 ```mermaid
@@ -206,6 +232,8 @@ erDiagram
     profiles ||--o{ reviews : "writes (reviewer_id)"
     profiles ||--o{ reviews : "receives (reviewed_user_id)"
     profiles ||--o{ admin_audit_log : "performs (admin_id)"
+    profiles ||--o{ reports : "creates (reporter_id)"
+    profiles ||--o{ reports : "reviews (reviewed_by)"
 
     listings ||--|| categories : "belongs to (category_id)"
     listings ||--o| locations : "located in (location_id)"
@@ -213,6 +241,7 @@ erDiagram
     listings ||--o{ messages : "references (listing_id)"
     listings ||--o{ watchlist : "saved in (listing_id)"
     listings ||--o{ reviews : "rated in (listing_id)"
+    listings ||--o{ reports : "reported in (listing_id)"
 
     locations ||--o{ locations : "parent-child (parent_id)"
     locations ||--o{ profiles : "contains (location_id)"
@@ -223,6 +252,7 @@ erDiagram
 
     profiles {
         uuid id PK
+        string email
         string full_name
         string phone
         uuid location_id FK
@@ -315,6 +345,18 @@ erDiagram
         string target_type
         uuid target_id
         jsonb details
+        timestamptz created_at
+    }
+
+    reports {
+        uuid id PK
+        uuid listing_id FK
+        uuid reporter_id FK
+        text reason
+        string status
+        uuid reviewed_by FK
+        timestamptz reviewed_at
+        text admin_notes
         timestamptz created_at
     }
 ```
