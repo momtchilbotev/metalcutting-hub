@@ -88,6 +88,9 @@ export class Navbar {
               <li class="nav-item">
                 <a class="nav-link" href="/help">Помощ</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/contact">Контакти</a>
+              </li>
             </ul>
 
             <ul class="navbar-nav mx-auto">

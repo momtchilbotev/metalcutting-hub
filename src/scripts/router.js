@@ -143,6 +143,11 @@ const routes = {
     page: () => import('../pages/privacy/privacy.js'),
     title: 'Политика за защита на личните данни - Metalcutting Hub',
     template: '/pages/privacy/privacy.html'
+  },
+  '/contact': {
+    page: () => import('../pages/contact/contact.js'),
+    title: 'Контакти - Metalcutting Hub',
+    template: '/pages/contact/contact.html'
   }
 };
 
