@@ -21,8 +21,8 @@ export class Footer {
                 Metalcutting Hub
               </h5>
               <p class="text-light">
-                Пазарът за металорежещи инструменти в България.
-                Намирайте най-добрите оферти за резбофрези, свредла, фрези и други.
+                Пазарът за металообработваща техника и инструменти в България.
+                Намерете най-добрите оферти за метчици, свредла, фрези и други.
               </p>
               <div class="d-flex gap-3">
                 <a href="https://www.facebook.com/" class="text-light text-decoration-none" aria-label="Facebook">
