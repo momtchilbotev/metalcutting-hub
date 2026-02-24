@@ -133,6 +133,11 @@ const routes = {
     page: () => import('../pages/help/help.js'),
     title: 'Помощ - Metalcutting Hub',
     template: '/pages/help/help.html'
+  },
+  '/terms': {
+    page: () => import('../pages/terms/terms.js'),
+    title: 'Общи условия - Metalcutting Hub',
+    template: '/pages/terms/terms.html'
   }
 };
 
@@ -312,12 +317,12 @@ class Router {
     const href = link.getAttribute('href');
     if (!href) return;
 
-    // Skip external links, links with target, or special links
+    // Skip external links, links with target, anchor links, or special links
     if (
       href.startsWith('http') ||
       href.startsWith('//') ||
       href.startsWith('javascript:') ||
-      href === '#' ||
+      href.startsWith('#') ||
       link.target === '_blank' ||
       link.hasAttribute('download') ||
       e.ctrlKey ||

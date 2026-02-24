@@ -1,0 +1,191 @@
+/* Terms Page Styles */
+
+/* === Hero Section === */
+.terms-hero {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.terms-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+/* === Table of Contents === */
+.toc-card {
+  position: sticky;
+  top: 100px;
+  border-left: 4px solid var(--primary-color);
+  background: white;
+}
+
+.toc-card .list-group-item {
+  border: none;
+  padding: 0.5rem 1rem;
+  color: #495057;
+  transition: all 0.2s ease;
+}
+
+.toc-card .list-group-item:hover {
+  color: var(--primary-color);
+  background-color: rgba(13, 110, 253, 0.05);
+  padding-left: 1.25rem;
+}
+
+.toc-card .list-group-item.active {
+  color: var(--primary-color);
+  background-color: rgba(13, 110, 253, 0.1);
+  font-weight: 600;
+}
+
+/* === Content Sections === */
+.terms-content h2 {
+  color: var(--primary-color);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid rgba(13, 110, 253, 0.2);
+}
+
+.terms-content h3 {
+  color: #343a40;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.terms-content p {
+  color: #495057;
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.terms-content ul,
+.terms-content ol {
+  color: #495057;
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.terms-content li {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.terms-content strong {
+  color: #212529;
+}
+
+/* === Highlight Boxes === */
+.highlight-box {
+  background-color: rgba(13, 110, 253, 0.05);
+  border-left: 4px solid var(--primary-color);
+  padding: 1rem 1.25rem;
+  margin: 1.5rem 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.highlight-box.warning {
+  background-color: rgba(255, 193, 7, 0.1);
+  border-left-color: #ffc107;
+}
+
+.highlight-box.danger {
+  background-color: rgba(220, 53, 69, 0.1);
+  border-left-color: #dc3545;
+}
+
+.highlight-box.success {
+  background-color: rgba(25, 135, 84, 0.1);
+  border-left-color: #198754;
+}
+
+/* === Last Updated Badge === */
+.last-updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 2rem;
+  font-size: 0.9rem;
+}
+
+/* === Quick Links Cards === */
+.quick-link-card {
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.quick-link-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary-color);
+}
+
+.quick-link-card i {
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+/* === Definitions List === */
+.definition-list dt {
+  color: var(--primary-color);
+  font-weight: 600;
+  margin-top: 1rem;
+}
+
+.definition-list dd {
+  color: #495057;
+  margin-left: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+/* === Responsive === */
+@media (max-width: 991.98px) {
+  .toc-card {
+    position: relative;
+    top: 0;
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .terms-hero {
+    text-align: center;
+  }
+
+  .terms-content h2 {
+    font-size: 1.25rem;
+  }
+
+  .terms-content h3 {
+    font-size: 1.1rem;
+  }
+}
+
+/* === Print Styles === */
+@media print {
+  .toc-card,
+  .no-print {
+    display: none !important;
+  }
+
+  .terms-content h2 {
+    page-break-after: avoid;
+  }
+
+  .terms-content ul,
+  .terms-content ol {
+    page-break-inside: avoid;
+  }
+}
