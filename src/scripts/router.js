@@ -128,6 +128,11 @@ const routes = {
     page: () => import('../pages/about/about.js'),
     title: 'За нас - Metalcutting Hub',
     template: '/pages/about/about.html'
+  },
+  '/help': {
+    page: () => import('../pages/help/help.js'),
+    title: 'Помощ - Metalcutting Hub',
+    template: '/pages/help/help.html'
   }
 };
 

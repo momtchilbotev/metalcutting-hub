@@ -1,0 +1,259 @@
+/* Help Page Styles */
+
+/* === Hero Section === */
+.help-hero {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #0a58ca 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.help-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.5;
+}
+
+/* === Search Box === */
+.help-search-box {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.help-search-box .form-control {
+  height: 56px;
+  font-size: 1.1rem;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.help-search-box .btn {
+  padding: 0 1.5rem;
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* === Category Cards === */
+.help-category-card {
+  border: none;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  height: 100%;
+}
+
+.help-category-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.help-category-card .icon-wrapper {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+  font-size: 1.75rem;
+  color: white;
+}
+
+.help-category-card.buying .icon-wrapper {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.help-category-card.selling .icon-wrapper {
+  background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%);
+}
+
+.help-category-card.account .icon-wrapper {
+  background: linear-gradient(135deg, #fd7e14 0%, #ffc107 100%);
+}
+
+.help-category-card.safety .icon-wrapper {
+  background: linear-gradient(135deg, #dc3545 0%, #e91e63 100%);
+}
+
+/* === FAQ Accordion === */
+.faq-accordion .accordion-item {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 0.75rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.faq-accordion .accordion-button {
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+}
+
+.faq-accordion .accordion-button:not(.collapsed) {
+  background-color: rgba(13, 110, 253, 0.1);
+  color: var(--primary-color);
+}
+
+.faq-accordion .accordion-button:focus {
+  box-shadow: none;
+  border-color: rgba(13, 110, 253, 0.25);
+}
+
+.faq-accordion .accordion-body {
+  padding: 1.25rem;
+  color: #6c757d;
+}
+
+/* === Quick Links === */
+.quick-link-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.quick-link-item:hover {
+  background: rgba(13, 110, 253, 0.05);
+  border-color: var(--primary-color);
+  transform: translateX(5px);
+}
+
+.quick-link-item i {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-right: 1rem;
+  width: 32px;
+  text-align: center;
+}
+
+/* === Contact Cards === */
+.contact-card {
+  border: none;
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.contact-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.contact-card .card-body {
+  padding: 2rem;
+  text-align: center;
+}
+
+.contact-card i {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+/* === Tips Section === */
+.tip-card {
+  border-left: 4px solid var(--primary-color);
+  background: rgba(13, 110, 253, 0.05);
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.tip-card.warning {
+  border-left-color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
+}
+
+.tip-card.success {
+  border-left-color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+}
+
+.tip-card.danger {
+  border-left-color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
+}
+
+/* === Section Titles === */
+.section-title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 4px;
+  background: var(--primary-color);
+  border-radius: 2px;
+}
+
+/* === Breadcrumb === */
+.help-breadcrumb {
+  background: transparent;
+  padding: 0;
+  margin-bottom: 1rem;
+}
+
+.help-breadcrumb .breadcrumb-item a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+}
+
+.help-breadcrumb .breadcrumb-item a:hover {
+  color: white;
+}
+
+.help-breadcrumb .breadcrumb-item.active {
+  color: white;
+}
+
+/* === Popular Topics === */
+.popular-topic {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2rem;
+  margin: 0.25rem;
+  color: white;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.popular-topic:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+/* === Responsive === */
+@media (max-width: 767.98px) {
+  .help-search-box .form-control {
+    height: 48px;
+    font-size: 1rem;
+  }
+
+  .help-category-card .card-body {
+    padding: 1.5rem;
+  }
+
+  .help-category-card .icon-wrapper {
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+
+  .contact-card .card-body {
+    padding: 1.5rem;
+  }
+}
