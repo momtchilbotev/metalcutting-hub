@@ -123,6 +123,11 @@ const routes = {
     title: 'Reports - Moderator',
     template: '/pages/moderator/reports/reports.html',
     guard: () => moderatorGuard()
+  },
+  '/about': {
+    page: () => import('../pages/about/about.js'),
+    title: 'За нас - Metalcutting Hub',
+    template: '/pages/about/about.html'
   }
 };
 
