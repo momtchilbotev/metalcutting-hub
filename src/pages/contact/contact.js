@@ -6,11 +6,61 @@ export class ContactPage {
     this.container = document.getElementById(containerId);
     this.params = params;
     this.isSubmitting = false;
+    this.map = null;
   }
 
   async render() {
     this.container.innerHTML = this.getTemplate();
     this.attachEventListeners();
+    await this.initMap();
+  }
+
+  async initMap() {
+    // Load Leaflet CSS
+    if (!document.querySelector('link[href*="leaflet.css"]')) {
+      const leafletCss = document.createElement('link');
+      leafletCss.rel = 'stylesheet';
+      leafletCss.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+      leafletCss.integrity = 'sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=';
+      leafletCss.crossOrigin = '';
+      document.head.appendChild(leafletCss);
+    }
+
+    // Load Leaflet JS
+    if (!window.L) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.integrity = 'sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=';
+        script.crossOrigin = '';
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    // Initialize map - coordinates for бул. "Витоша" 100, София
+    const latitude = 42.6925;
+    const longitude = 23.3210;
+
+    const mapContainer = document.getElementById('contact-map');
+    if (mapContainer && window.L && !this.map) {
+      this.map = window.L.map('contact-map').setView([latitude, longitude], 16);
+
+      // Add OpenStreetMap tiles
+      window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(this.map);
+
+      // Add marker with popup
+      const marker = window.L.marker([latitude, longitude]).addTo(this.map);
+      marker.bindPopup(`
+        <div class="map-popup">
+          <strong><i class="bi bi-geo-alt-fill text-primary me-1"></i>Metalcutting Hub</strong><br>
+          <span>бул. "Витоша" 100<br>София, България</span>
+        </div>
+      `).openPopup();
+    }
   }
 
   getTemplate() {
@@ -322,18 +372,19 @@ export class ContactPage {
                 </div>
               </div>
 
-              <!-- Map Placeholder -->
+              <!-- Map -->
               <div class="card border-0 shadow-sm">
                 <div class="card-body p-4">
                   <h5 class="card-title mb-3">
                     <i class="bi bi-geo-alt text-primary me-2"></i>
                     Нашата локация
                   </h5>
-                  <div class="map-container">
-                    <div class="text-center">
-                      <i class="bi bi-map display-4 d-block mb-2"></i>
-                      <span>София, бул. "Витоша" 100</span>
-                    </div>
+                  <div id="contact-map" class="contact-map"></div>
+                  <div class="mt-3">
+                    <a href="https://www.google.com/maps/search/?api=1&query=42.6925,23.3210" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary btn-sm">
+                      <i class="bi bi-box-arrow-up-right me-1"></i>
+                      Отвори в Google Maps
+                    </a>
                   </div>
                 </div>
               </div>
@@ -617,6 +668,11 @@ export class ContactPage {
   }
 
   destroy() {
+    // Clean up map instance
+    if (this.map) {
+      this.map.remove();
+      this.map = null;
+    }
     if (this.container) {
       this.container.innerHTML = '';
     }

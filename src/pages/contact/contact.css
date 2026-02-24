@@ -245,16 +245,31 @@
   font-size: 1rem;
 }
 
-/* === Map Placeholder === */
-.map-container {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  border-radius: 1rem;
+/* === Map Container === */
+.contact-map {
   height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--secondary-color, #6c757d);
-  border: 2px dashed #dee2e6;
+  width: 100%;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.contact-map .leaflet-popup-content-wrapper {
+  border-radius: 0.5rem;
+}
+
+.contact-map .leaflet-popup-content {
+  margin: 0.75rem 1rem;
+  font-size: 0.875rem;
+}
+
+.map-popup {
+  line-height: 1.5;
+}
+
+.map-popup strong {
+  display: block;
+  margin-bottom: 0.25rem;
 }
 
 /* === Spinner === */
@@ -281,7 +296,7 @@
     font-size: 0.95rem;
   }
 
-  .map-container {
+  .contact-map {
     height: 250px;
   }
 }
