@@ -138,6 +138,11 @@ const routes = {
     page: () => import('../pages/terms/terms.js'),
     title: 'Общи условия - Metalcutting Hub',
     template: '/pages/terms/terms.html'
+  },
+  '/privacy': {
+    page: () => import('../pages/privacy/privacy.js'),
+    title: 'Политика за защита на личните данни - Metalcutting Hub',
+    template: '/pages/privacy/privacy.html'
   }
 };
 
