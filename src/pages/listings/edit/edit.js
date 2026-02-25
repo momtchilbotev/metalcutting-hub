@@ -2,6 +2,7 @@ import '../create/listing-form.css';
 import './edit.css';
 import { listingService } from '../../../scripts/services/listings.js';
 import { storageService } from '../../../scripts/services/storage.js';
+import { supabase } from '../../../scripts/utils/supabaseClient.js';
 import { Toast } from '../../../scripts/components/Toast.js';
 import { validateListingForm, validateImages, transformNumericFields } from '../../../scripts/utils/validators.js';
 import { formatFileSize } from '../../../scripts/utils/formatters.js';
@@ -388,10 +389,11 @@ export class ListingEditPage {
     submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Запазване...';
 
     try {
-      // Update listing
+      // Update listing metadata
       await listingService.updateListing(this.listingId, transformedData);
 
-      // TODO: Handle image updates (delete and upload new)
+      // Handle image updates (delete removed, upload new)
+      await this.handleImageUpdates();
 
       Toast.success('Промените са запазени!');
 
@@ -402,6 +404,95 @@ export class ListingEditPage {
       Toast.error(error.message || 'Грешка при запазване.');
       submitBtn.disabled = false;
       submitBtn.innerHTML = '<i class="bi bi-check-circle me-1"></i> Запази промените';
+    }
+  }
+
+  async handleImageUpdates() {
+    // 1. Delete images marked for deletion
+    for (const imageId of this.imagesToDelete) {
+      const image = this.listing.listing_images.find(img => img.id === imageId);
+      if (image) {
+        // Delete from database
+        const { error: dbError } = await supabase
+          .from('listing_images')
+          .delete()
+          .eq('id', imageId);
+
+        if (dbError) {
+          console.error('Error deleting image from database:', dbError);
+        }
+
+        // Delete from storage
+        try {
+          await storageService.deleteImage(image.storage_path);
+        } catch (storageError) {
+          console.error('Error deleting image from storage:', storageError);
+        }
+      }
+    }
+
+    // 2. Upload new images
+    if (this.selectedImages.length > 0) {
+      const uploadedImages = await storageService.uploadListingImages(
+        this.selectedImages,
+        this.listingId
+      );
+
+      // 3. Insert new image records
+      if (uploadedImages.length > 0) {
+        // Calculate starting order_index based on remaining existing images
+        const startingIndex = this.existingImages.length;
+
+        const { error: insertError } = await supabase
+          .from('listing_images')
+          .insert(
+            uploadedImages.map((img, i) => ({
+              listing_id: this.listingId,
+              storage_path: img.path,
+              order_index: startingIndex + i,
+              is_primary: startingIndex === 0 && i === 0 // First image is primary if no existing images
+            }))
+          );
+
+        if (insertError) {
+          console.error('Error inserting new images:', insertError);
+          throw new Error('Грешка при запазване на новите снимки.');
+        }
+
+        // 4. Update primary image if needed (no existing images and we have new ones)
+        if (startingIndex === 0 && uploadedImages.length > 0) {
+          // The first new image was already marked as primary in the insert
+          // No additional action needed
+        }
+      }
+    }
+
+    // 5. Ensure at least one primary image exists if there are images
+    await this.ensurePrimaryImage();
+  }
+
+  async ensurePrimaryImage() {
+    // Get current images for this listing
+    const { data: currentImages, error } = await supabase
+      .from('listing_images')
+      .select('id, is_primary, order_index')
+      .eq('listing_id', this.listingId)
+      .order('order_index', { ascending: true });
+
+    if (error || !currentImages || currentImages.length === 0) {
+      return; // No images or error, nothing to do
+    }
+
+    // Check if any image is primary
+    const hasPrimary = currentImages.some(img => img.is_primary);
+
+    if (!hasPrimary) {
+      // Set the first image (by order_index) as primary
+      const firstImage = currentImages[0];
+      await supabase
+        .from('listing_images')
+        .update({ is_primary: true })
+        .eq('id', firstImage.id);
     }
   }
 
