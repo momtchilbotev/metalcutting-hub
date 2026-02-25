@@ -1,4 +1,4 @@
-import { subscriptionService } from '../../services/subscription.js';
+import { subscriptionService } from '../../scripts/services/subscription.js';
 
 export class VerifySubscriptionPage {
   constructor(containerId, params = {}) {
