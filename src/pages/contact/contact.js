@@ -67,6 +67,12 @@ export class ContactPage {
     return `
       <!-- Hero Section -->
       <section class="contact-hero text-white py-5">
+        <!-- Rotating gear wheels -->
+        <div class="contact-hero-gear contact-hero-gear-1"><i class="bi bi-gear-wide-connected"></i></div>
+        <div class="contact-hero-gear contact-hero-gear-2"><i class="bi bi-gear-wide"></i></div>
+        <div class="contact-hero-gear contact-hero-gear-3"><i class="bi bi-gear-wide-connected"></i></div>
+        <div class="contact-hero-gear contact-hero-gear-4"><i class="bi bi-gear-wide"></i></div>
+
         <div class="container py-4 position-relative">
           <div class="row align-items-center">
             <div class="col-lg-8 mx-auto text-center">
