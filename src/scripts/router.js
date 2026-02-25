@@ -1,4 +1,4 @@
-import { authService } from './services/auth.js';
+import { authService, authGuard } from './services/auth.js';
 import { adminGuard } from './services/admin.js';
 import { moderatorGuard } from './services/moderator.js';
 
@@ -27,13 +27,13 @@ const routes = {
     page: () => import('../pages/listings/create/create.js'),
     title: 'Нова обява - Metalcutting Hub',
     template: '/pages/listings/create/create.html',
-    guard: authService.getSession.bind(authService)
+    guard: authGuard
   },
   '/listings/edit': {
     page: () => import('../pages/listings/edit/edit.js'),
     title: 'Редактирай обява - Metalcutting Hub',
     template: '/pages/listings/edit/edit.html',
-    guard: authService.getSession.bind(authService)
+    guard: authGuard
   },
   '/listings/view': {
     page: () => import('../pages/listings/details/details.js'),
@@ -44,25 +44,25 @@ const routes = {
     page: () => import('../pages/user/profile/profile.js'),
     title: 'Моят профил - Metalcutting Hub',
     template: '/pages/user/profile/profile.html',
-    guard: authService.getSession.bind(authService)
+    guard: authGuard
   },
   '/my-listings': {
     page: () => import('../pages/user/my-listings/my-listings.js'),
     title: 'Моите обяви - Metalcutting Hub',
     template: '/pages/user/my-listings/my-listings.html',
-    guard: authService.getSession.bind(authService)
+    guard: authGuard
   },
   '/watchlist': {
     page: () => import('../pages/user/watchlist/watchlist.js'),
     title: 'Наблюдавани - Metalcutting Hub',
     template: '/pages/user/watchlist/watchlist.html',
-    guard: authService.getSession.bind(authService)
+    guard: authGuard
   },
   '/messages': {
     page: () => import('../pages/messages/messages.js'),
     title: 'Съобщения - Metalcutting Hub',
     template: '/pages/messages/messages.html',
-    guard: authService.getSession.bind(authService)
+    guard: authGuard
   },
   '/admin': {
     page: () => import('../pages/admin/dashboard/dashboard.js'),
