@@ -1,3 +1,5 @@
+import { subscriptionService } from '../services/subscription.js';
+
 export class Footer {
   constructor(containerId) {
     this.container = document.getElementById(containerId);
@@ -5,6 +7,7 @@ export class Footer {
 
   render() {
     this.container.innerHTML = this.getTemplate();
+    this.attachEventListeners();
   }
 
   getTemplate() {
@@ -107,11 +110,37 @@ export class Footer {
     // Subscribe form
     const subscribeForm = document.getElementById('footer-subscribe');
     if (subscribeForm) {
-      subscribeForm.addEventListener('submit', (e) => {
+      subscribeForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = subscribeForm.querySelector('input[type="email"]').value;
-        window.showToast('Успешна абонация за новини!', 'success');
-        subscribeForm.reset();
+        const emailInput = subscribeForm.querySelector('input[type="email"]');
+        const email = emailInput.value.trim();
+        const submitBtn = subscribeForm.querySelector('button[type="submit"]');
+
+        if (!email) {
+          window.showToast('Моля, въведете имейл адрес.', 'warning');
+          return;
+        }
+
+        // Disable button while processing
+        const originalBtnText = submitBtn.textContent;
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Изпращане...';
+
+        try {
+          await subscriptionService.subscribe(email);
+          window.showToast('Проверете имейла си за потвърждение!', 'success');
+          subscribeForm.reset();
+        } catch (error) {
+          if (error.message === 'DUPLICATE_EMAIL') {
+            window.showToast('Този имейл вече е абониран!', 'warning');
+          } else {
+            console.error('Subscription error:', error);
+            window.showToast('Грешка при абониране. Опитайте пак.', 'error');
+          }
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = originalBtnText;
+        }
       });
     }
   }

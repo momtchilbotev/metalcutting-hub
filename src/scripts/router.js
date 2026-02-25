@@ -148,6 +148,11 @@ const routes = {
     page: () => import('../pages/contact/contact.js'),
     title: 'Контакти - Metalcutting Hub',
     template: '/pages/contact/contact.html'
+  },
+  '/verify-subscription': {
+    page: () => import('../pages/subscription/verify-subscription.js'),
+    title: 'Потвърждение на абонамент - Metalcutting Hub',
+    template: '/pages/subscription/verify-subscription.html'
   }
 };
 
