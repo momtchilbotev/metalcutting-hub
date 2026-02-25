@@ -48,11 +48,11 @@ export class HomePage {
   getTemplate() {
     return `
       <section class="hero-section">
-        <!-- Floating decorative shapes -->
-        <div class="hero-shape hero-shape-1"></div>
-        <div class="hero-shape hero-shape-2"></div>
-        <div class="hero-shape hero-shape-3"></div>
-        <div class="hero-shape hero-shape-4"></div>
+        <!-- Rotating gear wheels -->
+        <div class="hero-gear hero-gear-1"><i class="bi bi-gear-wide-connected"></i></div>
+        <div class="hero-gear hero-gear-2"><i class="bi bi-gear-wide"></i></div>
+        <div class="hero-gear hero-gear-3"><i class="bi bi-gear-wide-connected"></i></div>
+        <div class="hero-gear hero-gear-4"><i class="bi bi-gear-wide"></i></div>
 
         <div class="container py-5">
           <div class="row align-items-center">
