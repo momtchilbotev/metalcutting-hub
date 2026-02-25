@@ -28,7 +28,7 @@ A Bulgarian marketplace SAAS for buying and selling metalcutting tools, measurin
 
 | Layer | Components |
 |-------|------------|
-| **Services** | Auth (Supabase), Listings CRUD, Storage (images), Admin |
+| **Services** | Auth (Supabase), Listings CRUD, Storage (images), Admin, Newsletter Subscription |
 | **Utilities** | Validators, Formatters, Helpers, Supabase client |
 | **Components** | Navbar, Footer, ListingCard, Toast notifications |
 
@@ -101,7 +101,10 @@ Main marketplace listings table.
 | `currency` | VARCHAR(3) | Currency code (default: BGN) |
 | `condition` | VARCHAR(20) | 'new', 'used', or 'refurbished' |
 | `location_id` | UUID | Foreign key to locations |
-| `status` | VARCHAR(20) | 'active', 'sold', 'draft', or 'expired' |
+| `status` | VARCHAR(20) | 'active', 'sold', 'draft', 'expired', 'pending', or 'rejected' |
+| `rejection_reason` | TEXT | Reason for rejection (if status is 'rejected') |
+| `reviewed_by` | UUID | Foreign key to profiles (moderator who reviewed) |
+| `reviewed_at` | TIMESTAMPTZ | When the listing was reviewed |
 | `is_featured` | BOOLEAN | Featured listing flag |
 | `is_urgent` | BOOLEAN | Urgent listing flag |
 | `views_count` | INTEGER | View counter |
@@ -210,6 +213,19 @@ User reports for listings (inappropriate content, scams, etc.).
 | `admin_notes` | TEXT | Internal notes from admin |
 | `created_at` | TIMESTAMPTZ | Report creation timestamp |
 
+#### `newsletter_subscriptions`
+Email subscriptions for newsletter.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `email` | VARCHAR(255) | Subscriber email (unique) |
+| `verified` | BOOLEAN | Email verification status |
+| `verification_token` | UUID | Token for email verification |
+| `subscribed_at` | TIMESTAMPTZ | Subscription timestamp |
+| `verified_at` | TIMESTAMPTZ | When email was verified |
+| `unsubscribed_at` | TIMESTAMPTZ | When user unsubscribed |
+
 ### Storage Buckets
 
 Supabase Storage buckets for file uploads:
@@ -219,6 +235,14 @@ Supabase Storage buckets for file uploads:
 | `listing-images` | Yes | 5MB | image/jpeg, image/png, image/webp | Listing photos |
 | `category-icons` | Yes | 2MB | image/jpeg, image/png, image/webp, image/svg+xml | Category icons |
 | `avatars` | Yes | 2MB | image/jpeg, image/png, image/webp, image/gif | User avatars |
+
+### Edge Functions
+
+Supabase Edge Functions for server-side logic:
+
+| Function | Purpose |
+|----------|---------|
+| `send-confirmation` | Sends newsletter subscription confirmation emails via Resend API |
 
 ### Entity Relationship Diagram
 
@@ -281,6 +305,9 @@ erDiagram
         timestamptz expires_at
         timestamptz created_at
         timestamptz updated_at
+        text rejection_reason
+        uuid reviewed_by FK
+        timestamptz reviewed_at
     }
 
     listing_images {
@@ -359,6 +386,16 @@ erDiagram
         text admin_notes
         timestamptz created_at
     }
+
+    newsletter_subscriptions {
+        uuid id PK
+        string email
+        boolean verified
+        uuid verification_token
+        timestamptz subscribed_at
+        timestamptz verified_at
+        timestamptz unsubscribed_at
+    }
 ```
 
 ### Database Features
@@ -367,6 +404,25 @@ erDiagram
 - **Full-Text Search**: Bulgarian language support via `pg_trgm` extension
 - **Triggers**: Auto-update `updated_at` timestamps and view counting
 - **Indexes**: Performance-optimized indexes for common query patterns
+
+### Database Migrations
+
+| # | Migration | Description |
+|---|-----------|-------------|
+| 001 | `initial_schema` | Core tables: profiles, listings, categories, locations, messages, watchlist, reviews |
+| 002 | `rls_policies` | Row-Level Security policies for all tables |
+| 003 | `seed_data` | Initial seed data for categories and locations |
+| 004 | `indexes_functions` | Performance indexes and helper functions |
+| 005 | `admin_tables` | Admin audit log and related tables |
+| 006 | `add_increment_views_rpc` | RPC function for incrementing listing views |
+| 007 | `create_category_icons_bucket` | Storage bucket for category icons |
+| 008 | `add_email_to_profiles` | Add email column to profiles table |
+| 009 | `create_avatars_bucket` | Storage bucket for user avatars |
+| 010 | `create_reports_table` | User reports table for listing moderation |
+| 011 | `allow_moderators_view_audit_log` | Allow moderators to view admin audit log |
+| 012 | `add_pending_status` | Add pending/rejected status and review columns to listings |
+| 013 | `fix_listing_images_rls_for_moderators` | Allow moderators to view images of pending listings |
+| 014 | `create_newsletter_subscriptions` | Newsletter subscription table with email verification |
 
 ## Remaining Work
 
