@@ -47,70 +47,83 @@ export class HomePage {
 
   getTemplate() {
     return `
-      <section class="hero-section bg-primary text-white py-5">
-        <div class="container py-4">
+      <section class="hero-section">
+        <!-- Floating decorative shapes -->
+        <div class="hero-shape hero-shape-1"></div>
+        <div class="hero-shape hero-shape-2"></div>
+        <div class="hero-shape hero-shape-3"></div>
+        <div class="hero-shape hero-shape-4"></div>
+
+        <div class="container py-5">
           <div class="row align-items-center">
-            <div class="col-lg-8">
-              <h1 class="display-4 fw-bold mb-3">
-                <i class="bi bi-gear-wide-connected"></i>
+            <div class="col-lg-7 hero-content">
+              <h1 class="hero-title">
+                <i class="bi bi-gear-wide-connected hero-icon"></i>
                 Metalcutting Hub
               </h1>
-              <p class="lead mb-4">
+              <p class="hero-subtitle mb-4">
                 Пазарът за всичко необходимо за металообработка в България.
-                Намерете най-добрите оферти за резервни части, измервателни/режещи инструменти и много други.
+                Намерете най-добрите оферти за резервни части, измервателни и режещи инструменти.
               </p>
 
-              <!-- Search Form -->
-              <form id="home-search-form" class="row g-3">
-                <div class="col-md-8">
-                  <div class="input-group input-group-lg">
-                    <span class="input-group-text bg-white">
-                      <i class="bi bi-search"></i>
-                    </span>
-                    <input type="text" class="form-control" id="home-search-input"
-                      placeholder="Търсете инструменти, резервни части, ..."
-                      aria-label="Търсене">
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <button type="submit" class="btn btn-light btn-lg w-100 text-primary fw-bold">
-                    Търси
-                  </button>
-                </div>
+              <!-- Modern Search Box -->
+              <form id="home-search-form" class="hero-search-box d-flex align-items-center mb-3">
+                <span class="hero-search-icon">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input type="text" class="form-control hero-search-input flex-grow-1"
+                  id="home-search-input"
+                  placeholder="Търсете инструменти, резервни части..."
+                  aria-label="Търсене">
+                <button type="submit" class="btn hero-search-btn">
+                  <i class="bi bi-arrow-right-circle me-2"></i>Търси
+                </button>
               </form>
+
+              <!-- Trust Badge -->
+              <div class="hero-trust-badge">
+                <i class="bi bi-shield-check"></i>
+                <span>Безопасни сделки & проверени продавачи</span>
+              </div>
             </div>
 
-            <div class="col-lg-4 d-none d-lg-block">
-              <div class="text-center">
-                <i class="bi bi-tools display-1 opacity-50"></i>
+            <!-- Hero Visual -->
+            <div class="col-lg-5 d-none d-lg-block">
+              <div class="hero-visual">
+                <i class="bi bi-gear-wide hero-visual-icon"></i>
+                <i class="bi bi-tools hero-visual-inner"></i>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Quick Stats -->
-          <div class="row mt-5 pt-3 border-top border-light">
-            <div class="col-md-3 col-6 mb-3 mb-md-0">
-              <div class="text-center">
-                <h3 class="mb-1">1000+</h3>
-                <small class="opacity-75">Активни обяви</small>
+        <!-- Stats Bar -->
+        <div class="hero-stats">
+          <div class="container">
+            <div class="row">
+              <div class="col-6 col-md-3">
+                <div class="hero-stat-item">
+                  <div class="hero-stat-number">1000+</div>
+                  <div class="hero-stat-label">Активни обяви</div>
+                </div>
               </div>
-            </div>
-            <div class="col-md-3 col-6 mb-3 mb-md-0">
-              <div class="text-center">
-                <h3 class="mb-1">500+</h3>
-                <small class="opacity-75">Потребители</small>
+              <div class="col-6 col-md-3">
+                <div class="hero-stat-item">
+                  <div class="hero-stat-number">500+</div>
+                  <div class="hero-stat-label">Потребители</div>
+                </div>
               </div>
-            </div>
-            <div class="col-md-3 col-6">
-              <div class="text-center">
-                <h3 class="mb-1">10+</h3>
-                <small class="opacity-75">Категории</small>
+              <div class="col-6 col-md-3">
+                <div class="hero-stat-item">
+                  <div class="hero-stat-number">10+</div>
+                  <div class="hero-stat-label">Категории</div>
+                </div>
               </div>
-            </div>
-            <div class="col-md-3 col-6">
-              <div class="text-center">
-                <h3 class="mb-1">24/7</h3>
-                <small class="opacity-75">Поддръжка</small>
+              <div class="col-6 col-md-3">
+                <div class="hero-stat-item">
+                  <div class="hero-stat-number">24/7</div>
+                  <div class="hero-stat-label">Поддръжка</div>
+                </div>
               </div>
             </div>
           </div>
@@ -148,11 +161,11 @@ export class HomePage {
       </section>
 
       <!-- CTA Section -->
-      <section class="cta-section py-5 bg-primary text-white">
-        <div class="container text-center py-4">
-          <h2 class="mb-3">Имате инструменти за продажба?</h2>
-          <p class="lead mb-4">Създайте обява за минути и достигнете до стотици купувачи.</p>
-          <a href="/listings/create" class="btn btn-light btn-lg text-primary fw-bold">
+      <section class="cta-section py-5">
+        <div class="container text-center py-5">
+          <h2 class="cta-title mb-3">Имате инструменти за продажба?</h2>
+          <p class="cta-subtitle mb-4">Създайте обява за минути и достигнете до стотици купувачи.</p>
+          <a href="/listings/create" class="btn cta-btn">
             <i class="bi bi-plus-circle me-2"></i>Нова обява
           </a>
         </div>
