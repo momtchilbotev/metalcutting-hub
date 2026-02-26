@@ -129,7 +129,7 @@ The app will be available at `http://localhost:3000`.
 
 ## Documentation
 
-- **[Research & Requirements](./Research_metalcutting_hub_requirements.md)** - Comprehensive research on marketplace SAAS requirements, tech stack recommendations, and Bulgarian market considerations
+- **[Research & Requirements](./development-docs/Research_metalcutting_hub_requirements.md)** - Comprehensive research on marketplace SAAS requirements, tech stack recommendations, and Bulgarian market considerations
 
 ## Database Schema
 
@@ -530,7 +530,7 @@ erDiagram
 | 015 | `create_contact_submissions` | Contact form submissions table for admin/moderator management |
 
 ## Remaining Work
-
+- [ ] Implement the requirements in **[Security Audit](./development-docs/Research_security_audit_implementation.md)**
 - [ ] TypeScript migration (optional)
 - [ ] Testing suite (no tests yet)
 - [ ] Framework decision (stay vanilla or migrate to Next.js)
