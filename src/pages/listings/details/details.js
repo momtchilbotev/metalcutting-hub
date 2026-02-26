@@ -399,7 +399,7 @@ export class ListingDetailsPage {
 
     const showPhoneBtn = document.getElementById('show-phone-btn');
     if (showPhoneBtn) {
-      showPhoneBtn.innerHTML = `<i class="bi bi-telephone me-2"></i><a href="tel:${phone}" class="text-success text-decoration-none">${phone}</a>`;
+      showPhoneBtn.innerHTML = `<i class="bi bi-telephone me-2"></i><a href="tel:${phone}" class="text-white text-decoration-none">${phone}</a>`;
       showPhoneBtn.classList.remove('btn-outline-success');
       showPhoneBtn.classList.add('btn-success');
     }
