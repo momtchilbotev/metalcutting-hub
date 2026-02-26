@@ -35,14 +35,14 @@ This report documents the security vulnerabilities and malfunctions found during
 | 🔴 UNCHANGED | 64 | Remaining vulnerabilities not yet addressed |
 
 ### Severity Breakdown
-- **CRITICAL (8):** RLS disabled, PII exposure, privilege escalation, CSRF missing
+- **CRITICAL (6):** PII exposure, privilege escalation, CSRF missing
 - **HIGH (19):** Open redirect, IDOR, XSS, storage security, admin bypass
 - **MEDIUM (31):** No rate limiting, missing CSRF, account enumeration, message injection
 - **LOW (12):** Code quality, incomplete features, minor issues
 
 ### Risk Assessment
 
-The application has **8 CRITICAL** and **19 HIGH** severity vulnerabilities that represent significant security risks. These issues should be addressed before production deployment.
+The application has **6 CRITICAL** and **19 HIGH** severity vulnerabilities that represent significant security risks. These issues should be addressed before production deployment.
 
 ---
 
@@ -497,24 +497,25 @@ CREATE POLICY "Users can update own profile except role"
 
 ## Conclusion
 
-The Metalcutting Hub MVP has **8 CRITICAL** and **19 HIGH** severity vulnerabilities that must be addressed before production deployment.
+The Metalcutting Hub MVP has **6 CRITICAL** and **19 HIGH** severity vulnerabilities that must be addressed before production deployment.
 
 ### Progress Since Original Audit
 
-- **2 vulnerabilities resolved:**
+- **4 vulnerabilities resolved:**
   - MSG-C1: Hardcoded User ID → Now uses proper authentication
   - LIST-H5: Price upper bound → Validation implemented
+  - API-C1: RLS disabled on categories → RLS enabled with admin/moderator policies
+  - API-C2: RLS disabled on locations → RLS enabled with admin/moderator policies
 
 ### Key Remaining Issues
 
-1. **RLS disabled on public tables** - Data tampering risk (categories, locations)
-2. **Privilege escalation via RLS** - Users can self-promote to admin
-3. **IDOR in listing access** - Draft/expired listings accessible
-4. **PII phone exposure** - Privacy violation
-5. **Missing CSRF** - Multiple attack vectors
-6. **Client-side admin checks** - Direct API bypass possible
+1. **Privilege escalation via RLS** - Users can self-promote to admin
+2. **IDOR in listing access** - Draft/expired listings accessible
+3. **PII phone exposure** - Privacy violation
+4. **Missing CSRF** - Multiple attack vectors
+5. **Client-side admin checks** - Direct API bypass possible
 
-### Security Score: 45/100 (improved from 40/100)
+### Security Score: 50/100 (improved from 40/100)
 
 **Recommended Action:** Address all CRITICAL and HIGH severity issues before production launch. The application has a reasonable security baseline with Supabase Auth and RLS, but several critical gaps need immediate attention.
 
@@ -523,4 +524,4 @@ The Metalcutting Hub MVP has **8 CRITICAL** and **19 HIGH** severity vulnerabili
 *Report prepared by the Metalcutting Hub Security Audit Team*
 *Original Date: 2025-02-16*
 *Last Updated: 2026-02-26*
-*Total vulnerabilities found: 70 (8 Critical, 19 High, 31 Medium, 12 Low)*
+*Total vulnerabilities found: 68 (6 Critical, 19 High, 31 Medium, 12 Low)*
