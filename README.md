@@ -18,17 +18,18 @@ A Bulgarian marketplace SAAS for buying and selling metalcutting tools, measurin
 
 | Category | Pages |
 |----------|-------|
-| **Public** | Home, Login, Register |
+| **Public** | Home, Login, Register, Contact |
 | **Listings** | List view, Details, Create, Edit |
 | **User** | Profile, My Listings, Watchlist |
-| **Admin** | Dashboard, Listings, Users, Categories, Audit |
+| **Admin** | Dashboard, Listings, Users, Categories, Audit, Reports, Contact Messages |
+| **Moderator** | Dashboard, Listings, Categories, Reports, Contact Messages |
 | **Messages** | Messages page |
 
 ### Services & Architecture
 
 | Layer | Components |
 |-------|------------|
-| **Services** | Auth (Supabase), Listings CRUD, Storage (images), Admin, Newsletter Subscription |
+| **Services** | Auth (Supabase), Listings CRUD, Storage (images), Admin, Contact, Newsletter Subscription |
 | **Utilities** | Validators, Formatters, Helpers, Supabase client |
 | **Components** | Navbar, Footer, ListingCard, Toast notifications |
 
@@ -226,6 +227,26 @@ Email subscriptions for newsletter.
 | `verified_at` | TIMESTAMPTZ | When email was verified |
 | `unsubscribed_at` | TIMESTAMPTZ | When user unsubscribed |
 
+#### `contact_submissions`
+Contact form submissions from users (both authenticated and anonymous).
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `id` | UUID | Primary key |
+| `name` | TEXT | Contact name |
+| `email` | TEXT | Contact email |
+| `phone` | TEXT | Contact phone (optional) |
+| `subject` | TEXT | Message subject |
+| `message` | TEXT | Message content |
+| `user_id` | UUID | Foreign key to profiles (if authenticated) |
+| `status` | TEXT | 'new', 'read', 'in_progress', 'resolved', or 'spam' |
+| `priority` | TEXT | 'low', 'normal', 'high', or 'urgent' |
+| `admin_notes` | TEXT | Internal notes from admin/moderator |
+| `reviewed_by` | UUID | Foreign key to profiles (who reviewed) |
+| `reviewed_at` | TIMESTAMPTZ | When the submission was reviewed |
+| `created_at` | TIMESTAMPTZ | Submission timestamp |
+| `updated_at` | TIMESTAMPTZ | Last update timestamp |
+
 ### Storage Buckets
 
 Supabase Storage buckets for file uploads:
@@ -258,6 +279,8 @@ erDiagram
     profiles ||--o{ admin_audit_log : "performs (admin_id)"
     profiles ||--o{ reports : "creates (reporter_id)"
     profiles ||--o{ reports : "reviews (reviewed_by)"
+    profiles ||--o{ contact_submissions : "submits (user_id)"
+    profiles ||--o{ contact_submissions : "reviews (reviewed_by)"
 
     listings ||--|| categories : "belongs to (category_id)"
     listings ||--o| locations : "located in (location_id)"
@@ -396,6 +419,23 @@ erDiagram
         timestamptz verified_at
         timestamptz unsubscribed_at
     }
+
+    contact_submissions {
+        uuid id PK
+        string name
+        string email
+        string phone
+        string subject
+        text message
+        uuid user_id FK
+        string status
+        string priority
+        text admin_notes
+        uuid reviewed_by FK
+        timestamptz reviewed_at
+        timestamptz created_at
+        timestamptz updated_at
+    }
 ```
 
 ### Database Features
@@ -423,6 +463,7 @@ erDiagram
 | 012 | `add_pending_status` | Add pending/rejected status and review columns to listings |
 | 013 | `fix_listing_images_rls_for_moderators` | Allow moderators to view images of pending listings |
 | 014 | `create_newsletter_subscriptions` | Newsletter subscription table with email verification |
+| 015 | `create_contact_submissions` | Contact form submissions table for admin/moderator management |
 
 ## Remaining Work
 
