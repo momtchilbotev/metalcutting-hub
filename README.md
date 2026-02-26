@@ -47,21 +47,85 @@ A Bulgarian marketplace SAAS for buying and selling metalcutting tools, measurin
 | **Styling** | Bootstrap 5 + Custom CSS + Sass |
 | **Language** | Bulgarian (bg-BG) primary |
 
-## Development
+## Project Structure
 
-```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
 ```
+metalcutting-hub/
+├── src/
+│   ├── index.html           # Main HTML template
+│   ├── pages/               # Page components organized by feature
+│   │   ├── auth/            # Login, Register
+│   │   ├── listings/        # List, Details, Create, Edit
+│   │   ├── user/            # Profile, My Listings, Watchlist
+│   │   ├── admin/           # Admin panel pages
+│   │   ├── moderator/       # Moderator panel pages
+│   │   ├── messages/        # User messaging
+│   │   ├── home/            # Landing page
+│   │   └── ...              # Other pages (about, contact, etc.)
+│   ├── scripts/
+│   │   ├── components/      # Reusable UI components (Navbar, Footer, Toast)
+│   │   ├── services/        # Business logic (auth, listings, admin, contact)
+│   │   ├── utils/           # Utilities (supabaseClient, validators, helpers)
+│   │   ├── router.js        # Client-side routing with auth guards
+│   │   ├── main.js          # App entry point
+│   │   └── config.js        # App configuration
+│   └── styles/              # CSS and SCSS stylesheets
+├── public/                  # Static assets
+├── supabase/                # Supabase configuration and migrations
+├── dist/                    # Production build output (git-ignored)
+├── .env                     # Environment variables (git-ignored)
+├── .env.example             # Environment variables template
+├── vite.config.js           # Vite configuration
+└── package.json             # Dependencies and scripts
+```
+
+## Local Development Setup
+
+### Prerequisites
+
+- **Node.js** v18 or higher
+- **npm** v9 or higher
+- A **Supabase** account with a project set up
+
+### Environment Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/momtchilbotev/metalcutting-hub.git
+   cd metalcutting-hub
+   ```
+
+2. Copy the environment template and configure:
+   ```bash
+   cp .env.example .env
+   ```
+
+3. Edit `.env` with your Supabase credentials:
+   ```
+   VITE_SUPABASE_URL=your_supabase_project_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+    # Supabse Edge Functions Configuration
+    RESEND_API_KEY=your_resend_api_key
+    BASE_URL=http://localhost:3000 or app URL when deployed
+
+   ```
+
+4. Install dependencies and start the dev server:
+   ```bash
+   npm install
+   npm run dev
+   ```
+
+The app will be available at `http://localhost:3000`.
+
+### Available Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Vite dev server on port 3000 |
+| `npm run build` | Build for production to `dist/` |
+| `npm run preview` | Preview production build locally |
 
 ## Documentation
 
