@@ -104,7 +104,7 @@ export class WatchlistPage {
                 <a href="/messages" class="list-group-item list-group-item-action">
                   <i class="bi bi-chat me-2"></i>Съобщения
                 </a>
-                <button class="list-group-item list-group-item-action text-danger" id="logout-btn">
+                <button type="button" class="list-group-item list-group-item-action text-danger" id="sidebar-logout-btn">
                   <i class="bi bi-box-arrow-right me-2"></i>Изход
                 </button>
               </div>
@@ -155,12 +155,19 @@ export class WatchlistPage {
   }
 
   attachEventListeners() {
-    const logoutBtn = document.getElementById('logout-btn');
+    const logoutBtn = this.container.querySelector('#sidebar-logout-btn');
 
     // Logout
     if (logoutBtn) {
-      logoutBtn.addEventListener('click', async () => {
-        await authService.logout();
+      logoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        try {
+          await authService.logout();
+        } catch (error) {
+          console.error('Sidebar logout error:', error);
+          Toast.error('Грешка при излизане.');
+        }
       });
     }
 
