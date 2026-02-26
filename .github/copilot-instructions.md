@@ -49,6 +49,7 @@ Classical client-server application:
 - Use Supabase Storage for file uploads (e.g., task attachments)
 - **Always use migrations for schema changes** — keep a copy of migration SQL files in the code
 - **Never edit existing migrations** after they've been applied — create a new migration instead
+- Use Supabase mcp tools for managing migrations and database changes. For pulling migrations use 'supabase_migrations.schema_migrations' table that has a statements column, containing the original with SQL of each migration.
 
 ## Authentication and Authorization
 
