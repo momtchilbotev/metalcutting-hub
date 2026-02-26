@@ -55,7 +55,7 @@ export class MessagesPage {
         receiver_id,
         content,
         created_at,
-        read_at,
+        is_read,
         listing_id
       `)
       .or(`sender_id.eq.${this.user.id},receiver_id.eq.${this.user.id}`)
@@ -78,7 +78,7 @@ export class MessagesPage {
       }
 
       // Count unread
-      if (msg.receiver_id === this.user.id && !msg.read_at) {
+      if (msg.receiver_id === this.user.id && !msg.is_read) {
         conversationMap.get(otherUserId).unread_count++;
       }
     }
@@ -142,10 +142,10 @@ export class MessagesPage {
     // Mark as read
     await supabase
       .from('messages')
-      .update({ read_at: new Date().toISOString() })
+      .update({ is_read: true })
       .eq('receiver_id', this.user.id)
       .eq('sender_id', otherUserId)
-      .is('read_at', null);
+      .eq('is_read', false);
 
     // Update unread count
     const conv = this.conversations.find(c => c.other_user_id === otherUserId);
