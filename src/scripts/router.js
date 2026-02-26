@@ -349,6 +349,8 @@ class Router {
       href.startsWith('http') ||
       href.startsWith('//') ||
       href.startsWith('javascript:') ||
+      href.startsWith('mailto:') ||
+      href.startsWith('tel:') ||
       href.startsWith('#') ||
       link.target === '_blank' ||
       link.hasAttribute('download') ||
