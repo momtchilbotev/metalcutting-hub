@@ -530,7 +530,7 @@ erDiagram
 | 015 | `create_contact_submissions` | Contact form submissions table for admin/moderator management |
 
 ## Remaining Work
-- [ ] Implement the requirements in **[Security Audit](./development-docs/Research_security_audit_implementation.md)**
+- [ ] Implement the requirements in **[Security Audit](./development-docs/Report_security_audit_implementation.md)**
 - [ ] TypeScript migration (optional)
 - [ ] Testing suite (no tests yet)
 - [ ] Framework decision (stay vanilla or migrate to Next.js)
