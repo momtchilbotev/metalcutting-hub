@@ -23,16 +23,16 @@ This report documents the security vulnerabilities and malfunctions found during
 | User Profiles | 1 | 1 | 3 | 1 | 6 |
 | Messages | 0 | 1 | 2 | 0 | 3 |
 | Admin Panel | 3 | 5 | 8 | 1 | 17 |
-| API/RLS | 2 | 1 | 3 | 1 | 7 |
-| **TOTAL** | **8** | **19** | **31** | **12** | **70** |
+| API/RLS | 0 | 1 | 3 | 1 | 5 |
+| **TOTAL** | **6** | **19** | **31** | **12** | **68** |
 
 ### Changes Since Original Audit
 
 | Status | Count | Details |
 |--------|-------|---------|
-| ✅ RESOLVED | 2 | MSG-C1 (Hardcoded User ID), LIST-H5 (Price upper bound) |
+| ✅ RESOLVED | 4 | MSG-C1 (Hardcoded User ID), LIST-H5 (Price upper bound), API-C1 (categories RLS), API-C2 (locations RLS) |
 | ⚠️ UPDATED | 3 | Location paths updated, RLS policy details clarified |
-| 🔴 UNCHANGED | 66 | Remaining vulnerabilities not yet addressed |
+| 🔴 UNCHANGED | 64 | Remaining vulnerabilities not yet addressed |
 
 ### Severity Breakdown
 - **CRITICAL (8):** RLS disabled, PII exposure, privilege escalation, CSRF missing
@@ -48,18 +48,14 @@ The application has **8 CRITICAL** and **19 HIGH** severity vulnerabilities that
 
 ## CRITICAL Vulnerabilities (Immediate Action Required)
 
-### AUTH/BACKEND: RLS Disabled on Public Tables
-- **Severity:** CRITICAL
+### ~~AUTH/BACKEND: RLS Disabled on Public Tables~~
+- **Severity:** ~~CRITICAL~~
 - **CWE:** CWE-285, CWE-732
-- **Status:** 🔴 UNRESOLVED
+- **Status:** ✅ RESOLVED
 - **Location:** Database tables `categories` and `locations`
 - **Description:** Row Level Security (RLS) is NOT enabled on `categories` and `locations` tables, even though RLS policies exist.
 - **Impact:** Unauthorized modification/deletion of categories and locations data
-- **Fix:**
-```sql
-ALTER TABLE public.categories ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.locations ENABLE ROW LEVEL SECURITY;
-```
+- **Resolution:** RLS enabled and INSERT/UPDATE/DELETE policies added for admin/moderator roles via migration `016_enable_rls_categories_locations.sql` (2026-02-26)
 
 ### USER PROFILES: PII Phone Number Exposure
 - **Severity:** CRITICAL
@@ -357,12 +353,14 @@ CREATE POLICY "Users can update own profile except role"
 
 **Status:** ✓ Complete (Updated from Supabase Security Advisors)
 
-### CRITICAL Severity (2)
+### CRITICAL Severity (0)
 
 | ID | Vulnerability | Table | Description | Status |
 |----|---------------|-------|-------------|--------|
-| API-C1 | RLS Disabled | `categories` | Policies exist but RLS not enabled | 🔴 UNRESOLVED |
-| API-C2 | RLS Disabled | `locations` | Policies exist but RLS not enabled | 🔴 UNRESOLVED |
+| ~~API-C1~~ | ~~RLS Disabled~~ | ~~`categories`~~ | ~~Policies exist but RLS not enabled~~ | ✅ RESOLVED |
+| ~~API-C2~~ | ~~RLS Disabled~~ | ~~`locations`~~ | ~~Policies exist but RLS not enabled~~ | ✅ RESOLVED |
+
+**API-C1/API-C2 Resolution:** RLS enabled via migration `016_enable_rls_categories_locations.sql` (2026-02-26). INSERT/UPDATE/DELETE policies added for admin/moderator roles.
 
 **Note:** Password Breach Protection (API-C3) moved to CRITICAL section above.
 
@@ -400,8 +398,8 @@ CREATE POLICY "Users can update own profile except role"
 | reports | ✅ Yes | Secure |
 | newsletter_subscriptions | ✅ Yes | Secure (permissive INSERT expected) |
 | contact_submissions | ✅ Yes | Secure (permissive INSERT expected) |
-| **categories** | ❌ **No** | **VULNERABLE** |
-| **locations** | ❌ **No** | **VULNERABLE** |
+| categories | ✅ Yes | Secure (admin/moderator write access) |
+| locations | ✅ Yes | Secure (admin/moderator write access) |
 
 ---
 
@@ -441,12 +439,11 @@ CREATE POLICY "Users can update own profile except role"
 
 ### IMMEDIATE (Critical - Block Production)
 
-1. **Enable RLS on categories and locations** - Single migration required
-2. **Fix privilege escalation in RLS policy** - Prevent self-role updates
-3. **Implement phone number privacy controls** - Require auth for viewing
-4. **Fix IDOR in getListingById()** - Add status validation
-5. **Enable HaveIBeenPwned password protection** - Supabase Auth setting
-6. **Implement CSRF protection** - All state-changing forms
+1. **Fix privilege escalation in RLS policy** - Prevent self-role updates
+2. **Implement phone number privacy controls** - Require auth for viewing
+3. **Fix IDOR in getListingById()** - Add status validation
+4. **Enable HaveIBeenPwned password protection** - Supabase Auth setting
+5. **Implement CSRF protection** - All state-changing forms
 
 ### HIGH PRIORITY (This Sprint)
 
@@ -485,7 +482,7 @@ CREATE POLICY "Users can update own profile except role"
 1. ✅ Using Supabase Auth for secure authentication
 2. ✅ Proper use of `textContent` instead of `innerHTML`
 3. ✅ `escapeHtml()` function implemented in validators.js
-4. ✅ RLS enabled on sensitive tables (except categories/locations)
+4. ✅ RLS enabled on all tables with appropriate policies
 5. ✅ TLS enforced by Supabase
 6. ✅ Admin actions logged to audit table
 7. ✅ Proper autocomplete attributes
@@ -494,6 +491,7 @@ CREATE POLICY "Users can update own profile except role"
 10. ✅ Price validation with upper bound (9,999,999.99 BGN)
 11. ✅ Messages page properly uses authService.getUser()
 12. ✅ Message content length validation (5-2000 characters)
+13. ✅ Categories and locations protected with admin/moderator-only write access
 
 ---
 
