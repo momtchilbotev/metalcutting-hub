@@ -294,7 +294,10 @@ export function formatAdminAction(action) {
     'unban_user': 'Отблокирай потребител',
     'create_category': 'Създай категория',
     'update_category': 'Редактирай категория',
-    'delete_category': 'Изтрий категория'
+    'delete_category': 'Изтрий категория',
+    'update_contact_submission': 'Актуализирай контакт форма',
+    'mark_contact_read': 'Маркирай като прочетено',
+    'update_contact_priority': 'Промени приоритет'
   };
   return actions[action] || action;
 }
@@ -308,9 +311,76 @@ export function formatTargetType(targetType) {
   const types = {
     'listing': 'Обява',
     'user': 'Потребител',
-    'category': 'Категория'
+    'category': 'Категория',
+    'contact_submission': 'Контакт форма',
+    'report': 'Доклад'
   };
   return types[targetType] || targetType;
+}
+
+/**
+ * Format contact subject in Bulgarian
+ * @param {string} subject - Subject value
+ * @returns {string} - Bulgarian subject text
+ */
+export function formatContactSubject(subject) {
+  const subjects = {
+    'general': 'Общ въпрос',
+    'listing': 'Въпрос за обява',
+    'account': 'Проблем с акаунт',
+    'partnership': 'Партньорство',
+    'feedback': 'Обратна връзка',
+    'report': 'Доклад за нарушение',
+    'other': 'Друго'
+  };
+  return subjects[subject] || subject;
+}
+
+/**
+ * Format contact status in Bulgarian
+ * @param {string} status - Status value
+ * @returns {string} - Bulgarian status text
+ */
+export function formatContactStatus(status) {
+  const statuses = {
+    'new': 'Ново',
+    'read': 'Прочетено',
+    'in_progress': 'В процес',
+    'resolved': 'Решено',
+    'spam': 'Спам'
+  };
+  return statuses[status] || status;
+}
+
+/**
+ * Get contact status badge class
+ * @param {string} status - Status value
+ * @returns {string} - Bootstrap badge class
+ */
+export function getContactStatusBadgeClass(status) {
+  const classes = {
+    'new': 'bg-danger',
+    'read': 'bg-secondary',
+    'in_progress': 'bg-warning text-dark',
+    'resolved': 'bg-success',
+    'spam': 'bg-dark'
+  };
+  return classes[status] || 'bg-secondary';
+}
+
+/**
+ * Format contact priority in Bulgarian
+ * @param {string} priority - Priority value
+ * @returns {string} - Bulgarian priority text
+ */
+export function formatContactPriority(priority) {
+  const priorities = {
+    'low': 'Нисък',
+    'normal': 'Нормален',
+    'high': 'Висок',
+    'urgent': 'Спешен'
+  };
+  return priorities[priority] || priority;
 }
 
 /**

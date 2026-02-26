@@ -1,5 +1,6 @@
 import './contact.css';
 import { authService } from '../../scripts/services/auth.js';
+import { contactService } from '../../scripts/services/contact.js';
 
 export class ContactPage {
   constructor(containerId, params = {}) {
@@ -588,16 +589,14 @@ export class ContactPage {
       // User not logged in, continue without user ID
     }
 
-    // Prepare contact data
+    // Prepare contact data - only essential fields
     const contactData = {
       name: formData.get('name'),
       email: formData.get('email'),
-      phone: formData.get('phone') || null,
+      phone: formData.get('phone') || undefined,
       subject: formData.get('subject'),
       message: formData.get('message'),
-      user_id: userId,
-      created_at: new Date().toISOString(),
-      status: 'new'
+      user_id: userId || undefined
     };
 
     try {
@@ -634,26 +633,9 @@ export class ContactPage {
   }
 
   async submitContactForm(data) {
-    // In a real application, this would:
-    // 1. Store the contact submission in Supabase
-    // 2. Send an email notification
-    // 3. Potentially trigger other workflows
-
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // For now, just log the submission
-    console.log('Contact form submission:', data);
-
-    // In production, uncomment and use Supabase:
-    // const { data: submission, error } = await supabase
-    //   .from('contact_submissions')
-    //   .insert([data]);
-    //
-    // if (error) throw error;
-    // return submission;
-
-    return { success: true };
+    // Submit the contact form using the contact service
+    const submission = await contactService.submitContactForm(data);
+    return submission;
   }
 
   setLoadingState(loading) {

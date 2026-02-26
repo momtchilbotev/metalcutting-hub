@@ -1,5 +1,6 @@
 import './dashboard.css';
 import { adminService } from '../../../scripts/services/admin.js';
+import { contactService } from '../../../scripts/services/contact.js';
 import { formatNumber, formatDate, formatAdminAction, formatTargetType } from '../../../scripts/utils/formatters.js';
 
 export class ModeratorDashboardPage {
@@ -9,6 +10,7 @@ export class ModeratorDashboardPage {
     this.stats = null;
     this.pendingReports = 0;
     this.pendingListings = 0;
+    this.newContactMessages = 0;
     this.todayActivity = [];
   }
 
@@ -16,10 +18,11 @@ export class ModeratorDashboardPage {
     this.container.innerHTML = this.getLoadingTemplate();
 
     try {
-      [this.stats, this.pendingReports, this.pendingListings, this.todayActivity] = await Promise.all([
+      [this.stats, this.pendingReports, this.pendingListings, this.newContactMessages, this.todayActivity] = await Promise.all([
         adminService.getDashboardStats(),
         adminService.getPendingReportsCount(),
         adminService.getPendingListingsCount(),
+        contactService.getNewSubmissionsCount(),
         adminService.getTodayActivity(20)
       ]);
       this.container.innerHTML = this.getTemplate();
@@ -140,6 +143,25 @@ export class ModeratorDashboardPage {
               </div>
             </a>
           </div>
+
+          <div class="col-md-6 col-lg-3">
+            <a href="/moderator/contact-messages" class="text-decoration-none">
+              <div class="card shadow-sm moderator-stat-card ${this.newContactMessages > 0 ? 'border-info' : ''}">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <h6 class="text-muted mb-1">Контакт съобщения</h6>
+                      <h3 class="mb-0 ${this.newContactMessages > 0 ? 'text-info' : ''}">${formatNumber(this.newContactMessages)}</h3>
+                    </div>
+                    <div class="${this.newContactMessages > 0 ? 'bg-info' : 'bg-secondary'} bg-opacity-10 p-3 rounded">
+                      <i class="bi bi-envelope ${this.newContactMessages > 0 ? 'text-info' : 'text-secondary'} fs-4"></i>
+                    </div>
+                  </div>
+                  ${this.newContactMessages > 0 ? '<small class="text-info">Нови съобщения!</small>' : ''}
+                </div>
+              </div>
+            </a>
+          </div>
         </div>
 
         <!-- Quick Actions -->
@@ -164,6 +186,9 @@ export class ModeratorDashboardPage {
                   </a>
                   <a href="/moderator/reports" class="btn ${this.pendingReports > 0 ? 'btn-outline-danger' : 'btn-outline-primary'}">
                     <i class="bi bi-flag me-2"></i>Доклади ${this.pendingReports > 0 ? `<span class="badge bg-danger ms-1">${this.pendingReports}</span>` : ''}
+                  </a>
+                  <a href="/moderator/contact-messages" class="btn ${this.newContactMessages > 0 ? 'btn-outline-info' : 'btn-outline-primary'}">
+                    <i class="bi bi-envelope me-2"></i>Контакт съобщения ${this.newContactMessages > 0 ? `<span class="badge bg-info ms-1">${this.newContactMessages}</span>` : ''}
                   </a>
                 </div>
               </div>

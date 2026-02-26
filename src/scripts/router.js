@@ -100,6 +100,12 @@ const routes = {
     template: '/pages/admin/reports/reports.html',
     guard: () => adminGuard('admin')
   },
+  '/admin/contact-messages': {
+    page: () => import('../pages/admin/contact-messages/contact-messages.js'),
+    title: 'Contact Messages - Admin',
+    template: '/pages/admin/contact-messages/contact-messages.html',
+    guard: () => adminGuard('admin')
+  },
   '/moderator': {
     page: () => import('../pages/moderator/dashboard/dashboard.js'),
     title: 'Moderator Panel - Metalcutting Hub',
@@ -122,6 +128,12 @@ const routes = {
     page: () => import('../pages/moderator/reports/reports.js'),
     title: 'Reports - Moderator',
     template: '/pages/moderator/reports/reports.html',
+    guard: () => moderatorGuard()
+  },
+  '/moderator/contact-messages': {
+    page: () => import('../pages/moderator/contact-messages/contact-messages.js'),
+    title: 'Contact Messages - Moderator',
+    template: '/pages/moderator/contact-messages/contact-messages.html',
     guard: () => moderatorGuard()
   },
   '/about': {
