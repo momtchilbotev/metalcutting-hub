@@ -26,6 +26,9 @@ export class MessagesPage {
         return;
       }
 
+      // Load profile to ensure avatar is available in sidebar
+      await authService.getProfile();
+
       await this.loadConversations();
 
       // If we have a "to" parameter, start new conversation

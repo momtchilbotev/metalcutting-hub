@@ -35,6 +35,9 @@ export class WatchlistPage {
       return;
     }
 
+    // Load profile to ensure avatar is available in sidebar
+    await authService.getProfile();
+
     const { data, error } = await supabase
       .from('watchlist')
       .select(`
