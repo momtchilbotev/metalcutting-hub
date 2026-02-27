@@ -34,7 +34,7 @@ export class HelpPage {
                 Как да купувате, продавате и използвате платформата безопасно.
               </p>
 
-              <!-- Search Box -->
+              <!-- Search Box - TODO: Implement search functionality in future
               <div class="help-search-box">
                 <div class="input-group">
                   <input type="text" class="form-control" id="help-search-input"
@@ -44,6 +44,7 @@ export class HelpPage {
                   </button>
                 </div>
               </div>
+              -->
 
               <!-- Popular Topics -->
               <div class="mt-4">
@@ -700,59 +701,60 @@ export class HelpPage {
       });
     });
 
+    // TODO: Implement help search functionality in future
     // Help search functionality
-    const searchInput = document.getElementById('help-search-input');
-    const searchBtn = document.getElementById('help-search-btn');
+    // const searchInput = document.getElementById('help-search-input');
+    // const searchBtn = document.getElementById('help-search-btn');
 
-    const performSearch = () => {
-      const query = searchInput.value.trim().toLowerCase();
-      if (!query) return;
+    // const performSearch = () => {
+    //   const query = searchInput.value.trim().toLowerCase();
+    //   if (!query) return;
 
-      // Simple search: highlight matching accordion items
-      const accordionItems = document.querySelectorAll('.accordion-item');
-      let found = false;
+    //   // Simple search: highlight matching accordion items
+    //   const accordionItems = document.querySelectorAll('.accordion-item');
+    //   let found = false;
 
-      accordionItems.forEach(item => {
-        const text = item.textContent.toLowerCase();
-        const button = item.querySelector('.accordion-button');
+    //   accordionItems.forEach(item => {
+    //     const text = item.textContent.toLowerCase();
+    //     const button = item.querySelector('.accordion-button');
 
-        if (text.includes(query)) {
-          item.style.display = '';
-          if (!found) {
-            // Open first matching item
-            const collapseId = button?.getAttribute('data-bs-target');
-            if (collapseId) {
-              const collapse = document.querySelector(collapseId);
-              if (collapse && !collapse.classList.contains('show')) {
-                button?.click();
-              }
-            }
-            found = true;
-          }
-        } else {
-          item.style.display = 'none';
-        }
-      });
+    //     if (text.includes(query)) {
+    //       item.style.display = '';
+    //       if (!found) {
+    //         // Open first matching item
+    //         const collapseId = button?.getAttribute('data-bs-target');
+    //         if (collapseId) {
+    //           const collapse = document.querySelector(collapseId);
+    //           if (collapse && !collapse.classList.contains('show')) {
+    //             button?.click();
+    //           }
+    //         }
+    //         found = true;
+    //       }
+    //     } else {
+    //       item.style.display = 'none';
+    //     }
+    //   });
 
-      // Show feedback if no results
-      if (!found) {
-        window.showToast('Не са намерени резултати за: ' + query, 'info');
-      } else {
-        window.showToast('Намерени резултати за: ' + query, 'success');
-      }
-    };
+    //   // Show feedback if no results
+    //   if (!found) {
+    //     window.showToast('Не са намерени резултати за: ' + query, 'info');
+    //   } else {
+    //     window.showToast('Намерени резултати за: ' + query, 'success');
+    //   }
+    // };
 
-    if (searchBtn) {
-      searchBtn.addEventListener('click', performSearch);
-    }
+    // if (searchBtn) {
+    //   searchBtn.addEventListener('click', performSearch);
+    // }
 
-    if (searchInput) {
-      searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          performSearch();
-        }
-      });
-    }
+    // if (searchInput) {
+    //   searchInput.addEventListener('keypress', (e) => {
+    //     if (e.key === 'Enter') {
+    //       performSearch();
+    //     }
+    //   });
+    // }
 
     // Category card click handlers
     const categoryCards = document.querySelectorAll('.help-category-card');
